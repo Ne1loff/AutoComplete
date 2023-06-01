@@ -21,4 +21,13 @@ public class CsvField {
         if (fieldType != CsvFieldType.STRING) throw new ClassCastException();
         return (String) value;
     }
+
+    public boolean valueIsNull() {
+        return value == null;
+    }
+
+    public String getValueAsString() {
+        if (valueIsNull()) return "N";
+        return value.toString();
+    }
 }

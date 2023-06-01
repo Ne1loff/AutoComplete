@@ -1,6 +1,6 @@
 package org.example.parser.rpn;
 
-import org.example.model.AirportInfoLine;
+import org.example.model.AirportInfo;
 import org.example.model.CsvField;
 import org.example.parser.rpn.token.*;
 
@@ -11,8 +11,8 @@ import java.util.Objects;
 import java.util.function.Predicate;
 
 public class StackMachine {
-    public Predicate<AirportInfoLine> evaluate(List<Token> postfixExpression) {
-        Deque<Predicate<AirportInfoLine>> stack = new LinkedList<>();
+    public Predicate<AirportInfo> evaluate(List<Token> postfixExpression) {
+        Deque<Predicate<AirportInfo>> stack = new LinkedList<>();
         for (Token token : postfixExpression) {
             if (token instanceof ExpressionToken) {
                 ExpressionToken expression = (ExpressionToken) token;
@@ -23,7 +23,7 @@ public class StackMachine {
                 var right = stack.pop();
                 var left = stack.pop();
 
-                Predicate<AirportInfoLine> result;
+                Predicate<AirportInfo> result;
                 BooleanOperationType type = operation.getType();
 
                 if (Objects.requireNonNull(type) == BooleanOperationType.AND) {
@@ -39,7 +39,7 @@ public class StackMachine {
         return stack.pop();
     }
 
-    private Predicate<AirportInfoLine> generatePredicate(ExpressionToken expression) {
+    private Predicate<AirportInfo> generatePredicate(ExpressionToken expression) {
         return (info) -> {
             ComparativeOperationType type = expression.getComparativeOperationTypeType();
             var field = info.getField(expression.getFieldNumber() - 1);
@@ -61,8 +61,14 @@ public class StackMachine {
         var fieldType = field.getFieldType();
         switch (fieldType) {
             case INTEGER:
+                if (field.valueIsNull()) {
+                    return false;
+                }
                 return field.getIntValue() == Integer.parseInt(value);
             case DOUBLE:
+                if (field.valueIsNull()) {
+                    return false;
+                }
                 var first = field.getDoubleValue();
                 var second = Double.parseDouble(value);
                 return Double.compare(first, second) == 0;
@@ -78,8 +84,14 @@ public class StackMachine {
         var fieldType = field.getFieldType();
         switch (fieldType) {
             case INTEGER:
+                if (field.valueIsNull()) {
+                    return false;
+                }
                 return field.getIntValue() != Integer.parseInt(value);
             case DOUBLE:
+                if (field.valueIsNull()) {
+                    return false;
+                }
                 var first = field.getDoubleValue();
                 var second = Double.parseDouble(value);
                 return Double.compare(first, second) != 0;
@@ -95,8 +107,14 @@ public class StackMachine {
         var fieldType = field.getFieldType();
         switch (fieldType) {
             case INTEGER:
+                if (field.valueIsNull()) {
+                    return false;
+                }
                 return field.getIntValue() > Integer.parseInt(value);
             case DOUBLE:
+                if (field.valueIsNull()) {
+                    return false;
+                }
                 var first = field.getDoubleValue();
                 var second = Double.parseDouble(value);
                 return Double.compare(first, second) == 1;
@@ -113,8 +131,14 @@ public class StackMachine {
         var fieldType = field.getFieldType();
         switch (fieldType) {
             case INTEGER:
+                if (field.valueIsNull()) {
+                    return false;
+                }
                 return field.getIntValue() < Integer.parseInt(value);
             case DOUBLE:
+                if (field.valueIsNull()) {
+                    return false;
+                }
                 var first = field.getDoubleValue();
                 var second = Double.parseDouble(value);
                 return Double.compare(first, second) == -1;

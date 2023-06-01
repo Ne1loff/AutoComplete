@@ -1,11 +1,13 @@
 package org.example.command;
 
 import lombok.AllArgsConstructor;
-import org.example.model.AirportInfoLine;
+import lombok.Data;
+import org.example.model.AirportInfo;
 
 import java.util.function.Predicate;
 
+@Data
 @AllArgsConstructor
 public class FilterCommand {
-    private Predicate<AirportInfoLine> filter;
+    private Predicate<AirportInfo> filter;
 }

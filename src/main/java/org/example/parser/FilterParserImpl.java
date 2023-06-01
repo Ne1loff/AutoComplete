@@ -16,6 +16,8 @@ public class FilterParserImpl implements FilterParser {
 
     @Override
     public FilterCommand parse(String value) {
+        if (value.isEmpty() || value.isBlank()) return new FilterCommand((info) -> true);
+
         List<Token> tokens = lexer.getTokens(value);
         List<Token> postfixExpression = converter.convertToPostfix(tokens);
         var predicate = stackMachine.evaluate(postfixExpression);
