@@ -10,7 +10,7 @@ import org.example.reader.Reader;
 import org.example.searcher.Searcher;
 import org.example.searcher.SearcherImpl;
 import org.example.searcher.indexer.Indexer;
-import org.example.searcher.indexer.TrieIndexer;
+import org.example.searcher.indexer.SimpleIndexer;
 
 public class Main {
     public static void main(String[] args) {
@@ -20,7 +20,7 @@ public class Main {
         }
 
         Reader reader = new CsvReader();
-        Indexer indexer = new TrieIndexer(reader);
+        Indexer indexer = new SimpleIndexer(reader);
         Searcher searcher = new SearcherImpl(indexer, reader, new SimpleCsvRowParser());
 
         Messenger messenger = new ConsoleMessenger();
@@ -31,3 +31,4 @@ public class Main {
 }
 
 // command: column[1]>10 & column[5]='GKA' || column[5]='GTA'
+// command: column[1]<10 & column[5]='GKA'

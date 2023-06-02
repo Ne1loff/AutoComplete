@@ -38,11 +38,6 @@ public class TrieIndexer implements Indexer {
     }
 
     @Override
-    public long getIndex(String value) {
-        return trie.get(value);
-    }
-
-    @Override
     public List<Long> getIndexes(String value) {
         List<Long> result = trie.getValueSuggestions(value);
         Collections.sort(result);

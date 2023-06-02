@@ -53,7 +53,7 @@ public class Lexer {
 
     private Token generateExpretionToken(String expression) {
         expression = expression.trim();
-        Pattern pattern = Pattern.compile("((?<=\\[)\\d{1,2}(?=]))|([<>=]{1,2})|((?<=[<>= ])[^ ]*$)");
+        Pattern pattern = Pattern.compile("((?<=\\[)\\d{1,2}(?=]))|([<>=]{1,2})|((?<=['<>= ])[^' ]+)");
         Matcher matcher = pattern.matcher(expression);
 
         ExpressionToken token = new ExpressionToken();

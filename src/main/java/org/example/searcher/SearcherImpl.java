@@ -34,26 +34,14 @@ public class SearcherImpl implements Searcher {
         long end;
 
         var indexes = indexer.getIndexes(command.getAirportNamePrefix());
-        System.out.println("Indexer time: " + (System.nanoTime() - start) / 1_000_000);
+
         try (reader) {
-            var openStart = System.nanoTime();
-            reader.open(searchFileName, 512);
-            System.out.println("Open file time: " + (System.nanoTime() - openStart) / 1_000_000);
-
-            var readStart = System.nanoTime();
+            reader.open(searchFileName, 256);
             var lines = reader.getLines(indexes);
-            System.out.println("Read from CSV time: " + (System.nanoTime() - readStart) / 1_000_000);
-
-            var parseStart = System.nanoTime();
             var airportInfos = csvRowParser.parseRows(lines);
-            System.out.println("Parse CSV time: " + (System.nanoTime() - parseStart) / 1_000_000);
-
-            var filterStart = System.nanoTime();
-            result = airportInfos.stream()
+            result = airportInfos.parallelStream()
                     .filter(command.getFilterCommand().getFilter())
                     .collect(Collectors.toList());
-            System.out.println("Filter result time: " + (System.nanoTime() - filterStart) / 1_000_000);
-
             end = System.nanoTime();
         } catch (IOException e) {
             throw new RuntimeException(e);

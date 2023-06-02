@@ -20,7 +20,7 @@ public class SimpleCsvRowParser implements CsvRowParser {
         var fields = str.split(",");
         return AirportInfo.builder()
                 .name(fields[1])
-                .field(new CsvField(getInt(fields[0]), CsvFieldType.INTEGER))
+                .field(new CsvField(tryGetInt(fields[0]), CsvFieldType.INTEGER))
                 .field(new CsvField(fields[1], CsvFieldType.STRING))
                 .field(new CsvField(fields[2], CsvFieldType.STRING))
                 .field(new CsvField(fields[3], CsvFieldType.STRING))
@@ -29,7 +29,7 @@ public class SimpleCsvRowParser implements CsvRowParser {
                 .field(new CsvField(getDouble(fields[6]), CsvFieldType.DOUBLE))
                 .field(new CsvField(getDouble(fields[7]), CsvFieldType.DOUBLE))
                 .field(new CsvField(getInt(fields[8]), CsvFieldType.INTEGER))
-                .field(new CsvField(getDouble(fields[9]), CsvFieldType.DOUBLE))
+                .field(new CsvField(tryGetDouble(fields[9]), CsvFieldType.NULLABLE_DOUBLE))
                 .field(new CsvField(fields[10], CsvFieldType.STRING))
                 .field(new CsvField(fields[11], CsvFieldType.STRING))
                 .field(new CsvField(fields[12], CsvFieldType.STRING))
@@ -37,19 +37,22 @@ public class SimpleCsvRowParser implements CsvRowParser {
                 .build();
     }
 
+    private Integer tryGetInt(String field) {
+        if (field.equals("\\N")) return null;
+        return Integer.parseInt(field);
+    }
+
     private Integer getInt(String field) {
-        try {
-            return Integer.parseInt(field);
-        } catch (NumberFormatException e) {
-            return null;
-        }
+        return Integer.parseInt(field);
     }
 
     private Double getDouble(String field) {
-        try {
-            return Double.parseDouble(field);
-        } catch (NumberFormatException e) {
-            return null;
-        }
+        return Double.parseDouble(field);
+    }
+
+    private Double tryGetDouble(String field) {
+        if (field.equals("\\N")) return null;
+        return Double.parseDouble(field);
+
     }
 }

@@ -60,15 +60,17 @@ public class StackMachine {
     private boolean isEqual(CsvField field, String value) {
         var fieldType = field.getFieldType();
         switch (fieldType) {
+            case NULLABLE_INTEGER:
+                if (field.valueIsNull()) {
+                    return false;
+                }
             case INTEGER:
-                if (field.valueIsNull()) {
-                    return false;
-                }
                 return field.getIntValue() == Integer.parseInt(value);
-            case DOUBLE:
+            case NULLABLE_DOUBLE:
                 if (field.valueIsNull()) {
                     return false;
                 }
+            case DOUBLE:
                 var first = field.getDoubleValue();
                 var second = Double.parseDouble(value);
                 return Double.compare(first, second) == 0;
@@ -83,21 +85,22 @@ public class StackMachine {
     private boolean isNotEqual(CsvField field, String value) {
         var fieldType = field.getFieldType();
         switch (fieldType) {
+            case NULLABLE_INTEGER:
+                if (field.valueIsNull()) {
+                    return false;
+                }
             case INTEGER:
-                if (field.valueIsNull()) {
-                    return false;
-                }
                 return field.getIntValue() != Integer.parseInt(value);
-            case DOUBLE:
+            case NULLABLE_DOUBLE:
                 if (field.valueIsNull()) {
                     return false;
                 }
+            case DOUBLE:
                 var first = field.getDoubleValue();
                 var second = Double.parseDouble(value);
                 return Double.compare(first, second) != 0;
             case STRING:
                 return !(field.getStringValue().equals(value));
-
             default:
                 throw new IllegalStateException("Unexpected value: " + fieldType);
         }
@@ -106,15 +109,17 @@ public class StackMachine {
     private boolean isGreaterThan(CsvField field, String value) {
         var fieldType = field.getFieldType();
         switch (fieldType) {
+            case NULLABLE_INTEGER:
+                if (field.valueIsNull()) {
+                    return false;
+                }
             case INTEGER:
-                if (field.valueIsNull()) {
-                    return false;
-                }
                 return field.getIntValue() > Integer.parseInt(value);
-            case DOUBLE:
+            case NULLABLE_DOUBLE:
                 if (field.valueIsNull()) {
                     return false;
                 }
+            case DOUBLE:
                 var first = field.getDoubleValue();
                 var second = Double.parseDouble(value);
                 return Double.compare(first, second) == 1;
@@ -130,15 +135,17 @@ public class StackMachine {
     private boolean isLessThan(CsvField field, String value) {
         var fieldType = field.getFieldType();
         switch (fieldType) {
+            case NULLABLE_INTEGER:
+                if (field.valueIsNull()) {
+                    return false;
+                }
             case INTEGER:
-                if (field.valueIsNull()) {
-                    return false;
-                }
                 return field.getIntValue() < Integer.parseInt(value);
-            case DOUBLE:
+            case NULLABLE_DOUBLE:
                 if (field.valueIsNull()) {
                     return false;
                 }
+            case DOUBLE:
                 var first = field.getDoubleValue();
                 var second = Double.parseDouble(value);
                 return Double.compare(first, second) == -1;

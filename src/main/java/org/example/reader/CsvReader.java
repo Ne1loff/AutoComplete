@@ -11,8 +11,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class CsvReader implements Reader {
 
@@ -109,16 +107,29 @@ public class CsvReader implements Reader {
     }
 
     private String getFirstLineFromBuffer(CharBuffer charBuffer) {
-
-        Pattern pattern = Pattern.compile("([^\\n$]*(?:,[^\\r\\n]*){13})");
-        Matcher matcher = pattern.matcher(charBuffer);
-
-        if (!matcher.find()) return "";
-
-        return matcher.groupCount() > 1 ?
-                matcher.group(1)
-                : matcher.groupCount() == 0 ?
-                "" : matcher.group();
+        var start = 0;
+        for (int i = 0; i < charBuffer.length(); i++) {
+            if (charBuffer.get(i) == '\n') {
+                if (start != 0) {
+                    var builder = new StringBuilder(charBuffer.subSequence(start, i));
+                    replaceAll(builder, "\"", "");
+                    return builder.toString();
+                } else {
+                    var subBuff = charBuffer.subSequence(start, i);
+                    var commaCounter = 0;
+                    for (int j = subBuff.position(); j < subBuff.length(); j++) {
+                        if (subBuff.get(j) == ',') commaCounter++;
+                    }
+                    if (commaCounter == 13) {
+                        var builder = new StringBuilder(subBuff);
+                        replaceAll(builder, "\"", "");
+                        return builder.toString();
+                    }
+                    start = i + 1;
+                }
+            }
+        }
+        return "";
     }
 
     private List<FileLine> getLinesFromBuffer(CharBuffer charBuffer, int lastSepIndex, long offset) {
