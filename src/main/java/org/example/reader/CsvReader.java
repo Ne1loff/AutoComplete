@@ -144,14 +144,19 @@ public class CsvReader implements Reader {
         var fileOffset = offset;
         for (int i = 0; i < lastSepIndex + 1; i++) {
             if (charBuffer.get(i) == '\n') {
-                builder.append(charBuffer, charBuffLastPos, i);
-                replaceAll(builder, "\"", "");
+                var subSeq = charBuffer.subSequence(charBuffLastPos, i + 1);
 
-                var byteBuff = getByteBuffer(charBuffer.subSequence(charBuffLastPos, i + 1));
+                builder.append(subSeq);
+                builder.deleteCharAt(builder.length() - 1);
+                replaceAllUselessDoubleQuotes(builder);
+
+                var byteBuff = getByteBuffer(subSeq);
                 int lineLength = byteBuff.limit() - byteBuff.position();
-                fileOffset += lineLength;
 
                 result.add(new FileLine(builder.toString(), fileOffset, lineLength));
+
+                fileOffset += lineLength;
+
                 charBuffLastPos = i + 1;
                 builder.delete(0, builder.length());
             }
@@ -160,11 +165,17 @@ public class CsvReader implements Reader {
         return result;
     }
 
-    private void replaceAll(StringBuilder builder, String from, String to) {
-        int index = 0;
-        while ((index = builder.indexOf(from, index)) != -1) {
-            builder.replace(index, index + from.length(), to);
-            index += to.length();
+    private void replaceAllUselessDoubleQuotes(StringBuilder builder) {
+
+        for (int i = 0; i < builder.length(); i++) {
+            char ch = builder.charAt(i);
+            if (ch == '\\' && builder.charAt((i + 1) % builder.length()) == '"') {
+                builder.deleteCharAt(i);
+                continue;
+            }
+            if (ch == '"') {
+                builder.deleteCharAt(i);
+            }
         }
     }
 }

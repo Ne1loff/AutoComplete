@@ -10,7 +10,7 @@
     <packaging>jar</packaging>
 
     <build>
-        <finalName>airports-search-${version}</finalName>
+        <finalName>airports-search-${project.version}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -57,10 +57,17 @@
             <artifactId>lucene-analyzers-common</artifactId>
             <version>8.11.0</version>
         </dependency>
+
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>5.8.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>5.3.1</version>
             <scope>test</scope>
         </dependency>
 
