@@ -1,11 +1,13 @@
 package org.example.model;
 
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
-@Data
+@Getter
+@RequiredArgsConstructor
 public class SearchResult {
     private final List<AirportInfo> result;
     private final int resultCount;

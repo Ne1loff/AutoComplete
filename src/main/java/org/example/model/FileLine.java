@@ -1,11 +1,12 @@
 package org.example.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-@Data
-@AllArgsConstructor
+@Getter
+@RequiredArgsConstructor
 public class FileLine {
-    private String content;
-    private long startPosition;
+    private final String content;
+    private final long startPosition;
+    private final long length;
 }

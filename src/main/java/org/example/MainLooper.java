@@ -19,16 +19,29 @@ public class MainLooper {
         searcher.init(fileName);
 
         while (true) {
-            var message = messenger.requestFilter();
-            if (message.isQuitRequest()) break;
+            FilterCommand filterCommand = getFilterCommand();
+            if (filterCommand == null) break;
 
-            FilterCommand filterCommand = filterParser.parse(message.getContent());
-
-            message = messenger.requestNamePrefix();
+            var message = messenger.requestNamePrefix();
             if (message.isQuitRequest()) break;
 
             SearchResult result = searcher.search(new SearchCommand(message.getContent(), filterCommand));
             messenger.responseResults(result);
         }
+    }
+
+    private FilterCommand getFilterCommand() {
+        while (true) {
+            var message = messenger.requestFilter();
+            if (message.isQuitRequest()) break;
+
+            String content = message.getContent();
+            if (filterParser.isValidFilter(content)) {
+                return filterParser.parse(content);
+            } else {
+                messenger.invalidFilterMessage();
+            }
+        }
+        return null;
     }
 }

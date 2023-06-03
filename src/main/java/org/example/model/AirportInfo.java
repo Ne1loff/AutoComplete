@@ -1,17 +1,17 @@
 package org.example.model;
 
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.Singular;
 
 import java.util.List;
 
-@Data
+@Getter
 @Builder
 public class AirportInfo {
-    String name;
+    private final String name;
     @Singular
-    List<CsvField> fields;
+    private final List<CsvField> fields;
 
     public CsvField getField(int index) {
         return fields.get(index);

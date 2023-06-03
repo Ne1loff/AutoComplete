@@ -1,8 +1,10 @@
 package org.example.model;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-@Data
+@Getter
+@RequiredArgsConstructor
 public class Message {
     private final String content;
     private final boolean quitRequest;

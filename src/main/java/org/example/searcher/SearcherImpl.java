@@ -9,6 +9,7 @@ import org.example.reader.Reader;
 import org.example.searcher.indexer.Indexer;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,8 +35,10 @@ public class SearcherImpl implements Searcher {
         long end;
 
         var indexes = indexer.getIndexes(command.getAirportNamePrefix());
-
-        try (reader) {
+        if (indexes.size() == 0) {
+            end = System.nanoTime();
+            result = Collections.emptyList();
+        } else try (reader) {
             reader.open(searchFileName, 256);
             var lines = reader.getLines(indexes);
             var airportInfos = csvRowParser.parseRows(lines);
@@ -46,6 +49,7 @@ public class SearcherImpl implements Searcher {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
 
         return new SearchResult(result, result.size(), (end - start) / 1_000_000);
     }

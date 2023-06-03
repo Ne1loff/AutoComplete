@@ -1,8 +1,10 @@
 package org.example.parser.rpn.token;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-@Data
+@Getter
+@RequiredArgsConstructor
 public class OtherToken implements Token {
     private final TokenType type;
 

@@ -76,10 +76,6 @@ public class CsvReader implements Reader {
         return null;
     }
 
-    private CharBuffer getCharBuffer(ByteBuffer byteBuffer) {
-        return StandardCharsets.UTF_8.decode(byteBuffer);
-    }
-
     @Override
     public void close() throws IOException {
         if (reader != null) reader.close();
@@ -91,6 +87,14 @@ public class CsvReader implements Reader {
         if (reader == null) throw new IOException("File not open");
     }
 
+    private CharBuffer getCharBuffer(ByteBuffer byteBuffer) {
+        return StandardCharsets.UTF_8.decode(byteBuffer);
+    }
+
+    private ByteBuffer getByteBuffer(CharBuffer charBuffer) {
+        return StandardCharsets.UTF_8.encode(charBuffer);
+    }
+
     private int updateBufferAndGetLastLineSeparatorPos(
             ByteBuffer buffer,
             CharBuffer charBuffer
@@ -99,7 +103,7 @@ public class CsvReader implements Reader {
             if (charBuffer.get(i) == '\n') {
                 buffer.flip();
                 var subCharBuff = charBuffer.subSequence(i + 1, charBuffer.length());
-                buffer.put(StandardCharsets.UTF_8.encode(subCharBuff));
+                buffer.put(getByteBuffer(subCharBuff));
                 return i;
             }
         }
@@ -111,19 +115,20 @@ public class CsvReader implements Reader {
         for (int i = 0; i < charBuffer.length(); i++) {
             if (charBuffer.get(i) == '\n') {
                 if (start != 0) {
-                    var builder = new StringBuilder(charBuffer.subSequence(start, i));
-                    replaceAll(builder, "\"", "");
-                    return builder.toString();
+                    return charBuffer.subSequence(start, i).toString();
                 } else {
                     var subBuff = charBuffer.subSequence(start, i);
                     var commaCounter = 0;
+                    boolean wasOpenDoubleQuotes = false;
                     for (int j = subBuff.position(); j < subBuff.length(); j++) {
-                        if (subBuff.get(j) == ',') commaCounter++;
+                        char ch = subBuff.get(j);
+                        if (ch == '"') {
+                            wasOpenDoubleQuotes = !wasOpenDoubleQuotes;
+                        }
+                        if (ch == ',' && !wasOpenDoubleQuotes) commaCounter++;
                     }
                     if (commaCounter == 13) {
-                        var builder = new StringBuilder(subBuff);
-                        replaceAll(builder, "\"", "");
-                        return builder.toString();
+                        return subBuff.toString();
                     }
                     start = i + 1;
                 }
@@ -135,14 +140,19 @@ public class CsvReader implements Reader {
     private List<FileLine> getLinesFromBuffer(CharBuffer charBuffer, int lastSepIndex, long offset) {
         List<FileLine> result = new ArrayList<>();
         StringBuilder builder = new StringBuilder();
-        var lastPos = 0;
+        var charBuffLastPos = 0;
+        var fileOffset = offset;
         for (int i = 0; i < lastSepIndex + 1; i++) {
             if (charBuffer.get(i) == '\n') {
-                builder.append(charBuffer, lastPos, i);
+                builder.append(charBuffer, charBuffLastPos, i);
                 replaceAll(builder, "\"", "");
-                result.add(new FileLine(builder.toString(), offset + lastPos));
 
-                lastPos = i + 1;
+                var byteBuff = getByteBuffer(charBuffer.subSequence(charBuffLastPos, i + 1));
+                int lineLength = byteBuff.limit() - byteBuff.position();
+                fileOffset += lineLength;
+
+                result.add(new FileLine(builder.toString(), fileOffset, lineLength));
+                charBuffLastPos = i + 1;
                 builder.delete(0, builder.length());
             }
         }

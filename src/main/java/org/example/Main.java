@@ -30,5 +30,5 @@ public class Main {
     }
 }
 
-// command: column[1]>10 & column[5]='GKA' || column[5]='GTA'
+// command: column[1]<10 & column[5]='GKA' || column[5]='GTA'
 // command: column[1]<10 & column[5]='GKA'

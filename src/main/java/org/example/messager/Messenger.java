@@ -8,5 +8,7 @@ public interface Messenger {
 
     Message requestNamePrefix();
 
+    void invalidFilterMessage();
+
     void responseResults(SearchResult result);
 }

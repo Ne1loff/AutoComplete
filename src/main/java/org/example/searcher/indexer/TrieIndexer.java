@@ -23,11 +23,7 @@ public class TrieIndexer implements Indexer {
             while ((lines = reader.getFileLinesFormBuffer(fileName)) != null) {
                 for (FileLine line : lines) {
                     var content = line.getContent();
-                    int firstCommaIndex = content.indexOf(",");
-                    int secondCommaIndex = content.indexOf(",", firstCommaIndex + 1);
-
-                    var airportName = content.substring(firstCommaIndex + 1, secondCommaIndex)
-                            .trim();
+                    var airportName = getName(content);
                     trie.insert(airportName, line.getStartPosition());
                 }
             }
@@ -42,5 +38,13 @@ public class TrieIndexer implements Indexer {
         List<Long> result = trie.getValueSuggestions(value);
         Collections.sort(result);
         return result;
+    }
+
+    private String getName(String content) {
+        int firstCommaIndex = content.indexOf(",");
+        int secondCommaIndex = content.indexOf(",", firstCommaIndex + 1);
+
+        return content.substring(firstCommaIndex + 1, secondCommaIndex)
+                .trim();
     }
 }

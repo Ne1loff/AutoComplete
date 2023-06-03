@@ -17,7 +17,7 @@ public class SimpleCsvRowParser implements CsvRowParser {
     }
 
     private AirportInfo getAirportInfo(String str) {
-        var fields = str.split(",");
+        var fields = parseCsvRow(str);
         return AirportInfo.builder()
                 .name(fields[1])
                 .field(new CsvField(tryGetInt(fields[0]), CsvFieldType.INTEGER))
@@ -33,7 +33,7 @@ public class SimpleCsvRowParser implements CsvRowParser {
                 .field(new CsvField(fields[10], CsvFieldType.STRING))
                 .field(new CsvField(fields[11], CsvFieldType.STRING))
                 .field(new CsvField(fields[12], CsvFieldType.STRING))
-                .field(new CsvField(fields[12], CsvFieldType.STRING))
+                .field(new CsvField(fields[13], CsvFieldType.STRING))
                 .build();
     }
 
@@ -54,5 +54,37 @@ public class SimpleCsvRowParser implements CsvRowParser {
         if (field.equals("\\N")) return null;
         return Double.parseDouble(field);
 
+    }
+
+    private String[] parseCsvRow(String csvRow) {
+        String[] result = new String[14];
+        StringBuilder builder = new StringBuilder();
+
+        int resultCount = 0;
+        boolean wasOpenDoubleQuotes = false;
+
+        char[] charArray = csvRow.toCharArray();
+        for (int i = 0; i < charArray.length; i++) {
+            char ch = charArray[i];
+
+            if (ch == '\\' && charArray[(i + 1) % charArray.length] == '"') continue;
+
+            if (ch == '"') {
+                wasOpenDoubleQuotes = !wasOpenDoubleQuotes;
+                continue;
+            }
+
+            if (ch == ',' && !wasOpenDoubleQuotes) {
+                result[resultCount++] = builder.toString();
+                builder.delete(0, builder.length());
+                continue;
+            }
+
+            builder.append(ch);
+        }
+
+        result[resultCount] = builder.toString();
+
+        return result;
     }
 }

@@ -13,6 +13,7 @@ public class ConsoleMessenger implements Messenger {
     @Override
     public Message requestFilter() {
         System.out.print("\nВведите фильтр: ");
+        System.out.flush();
         var text = scanner.nextLine();
         return new Message(text, text.equals(EXIT_COMMAND));
     }
@@ -20,8 +21,15 @@ public class ConsoleMessenger implements Messenger {
     @Override
     public Message requestNamePrefix() {
         System.out.print("\nВведите начало имени аэропорта: ");
+        System.out.flush();
         var text = scanner.nextLine();
         return  new Message(text, text.equals(EXIT_COMMAND));
+    }
+
+    @Override
+    public void invalidFilterMessage() {
+        System.out.print("\nНедопустимый фильтр");
+        System.out.flush();
     }
 
     @Override

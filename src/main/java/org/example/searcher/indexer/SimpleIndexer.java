@@ -37,12 +37,20 @@ public class SimpleIndexer implements Indexer {
 
             public List<T> getValuesByIndexPrefix(String prefix) {
                 if (!isReady) throw new RuntimeException("Indexer was not prepared");
-                if (prefix.length() == 1) return new ArrayList<>(values.values());
+                if (prefix.length() == 1) {
+                    List<T> result = new ArrayList<>();
+                    for (int i = 0; i < indicesCount; i++) {
+                        result.add(values.get(indices[i].hashCode()));
+                    }
+                    return result;
+                }
 
                 prefix = prefix.toLowerCase();
                 List<T> result = new ArrayList<>();
                 int i = Arrays.binarySearch(
                         indices,
+                        0,
+                        indicesCount,
                         prefix,
                         (str, pref) -> str.startsWith(pref) ? 0 : str.compareTo(pref)
                 );
@@ -95,11 +103,13 @@ public class SimpleIndexer implements Indexer {
         private final Map<Character, SimpleIndexNode<T>> index = new HashMap<>();
 
         public void putValue(String key, T value) {
+            key = key.toLowerCase();
             var node = index.computeIfAbsent(key.charAt(0), c -> new SimpleIndexNode<>());
             node.putValue(key, value);
         }
 
         public List<T> getValuesByIndexPrefix(String prefix) {
+            prefix = prefix.toLowerCase();
             var node = index.get(prefix.charAt(0));
             if (node == null) return Collections.emptyList();
             return node.getValuesByIndexPrefix(prefix);
@@ -122,11 +132,7 @@ public class SimpleIndexer implements Indexer {
             while ((lines = reader.getFileLinesFormBuffer(fileName)) != null) {
                 for (FileLine line : lines) {
                     var content = line.getContent();
-                    int firstCommaIndex = content.indexOf(",");
-                    int secondCommaIndex = content.indexOf(",", firstCommaIndex + 1);
-
-                    var airportName = content.substring(firstCommaIndex + 1, secondCommaIndex)
-                            .trim();
+                    var airportName = getName(content);
                     index.putValue(airportName, line.getStartPosition());
                 }
             }
@@ -140,5 +146,13 @@ public class SimpleIndexer implements Indexer {
     @Override
     public List<Long> getIndexes(String value) {
         return index.getValuesByIndexPrefix(value);
+    }
+
+    private String getName(String content) {
+        int firstCommaIndex = content.indexOf(",");
+        int secondCommaIndex = content.indexOf(",", firstCommaIndex + 1);
+
+        return content.substring(firstCommaIndex + 1, secondCommaIndex)
+                .trim();
     }
 }
