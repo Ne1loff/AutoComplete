@@ -2,7 +2,7 @@ package org.example.parser;
 
 import org.example.model.AirportInfo;
 import org.example.model.CsvField;
-import org.example.model.CsvFieldType;
+import org.example.model.CsvFieldDataType;
 
 import java.util.Collection;
 import java.util.List;
@@ -20,20 +20,20 @@ public class SimpleCsvRowParser implements CsvRowParser {
         var fields = parseCsvRow(str);
         return AirportInfo.builder()
                 .name(fields[1])
-                .field(new CsvField(tryGetInt(fields[0]), CsvFieldType.INTEGER))
-                .field(new CsvField(fields[1], CsvFieldType.STRING))
-                .field(new CsvField(fields[2], CsvFieldType.STRING))
-                .field(new CsvField(fields[3], CsvFieldType.STRING))
-                .field(new CsvField(fields[4], CsvFieldType.STRING))
-                .field(new CsvField(fields[5], CsvFieldType.STRING))
-                .field(new CsvField(getDouble(fields[6]), CsvFieldType.DOUBLE))
-                .field(new CsvField(getDouble(fields[7]), CsvFieldType.DOUBLE))
-                .field(new CsvField(getInt(fields[8]), CsvFieldType.INTEGER))
-                .field(new CsvField(tryGetDouble(fields[9]), CsvFieldType.NULLABLE_DOUBLE))
-                .field(new CsvField(fields[10], CsvFieldType.STRING))
-                .field(new CsvField(fields[11], CsvFieldType.STRING))
-                .field(new CsvField(fields[12], CsvFieldType.STRING))
-                .field(new CsvField(fields[13], CsvFieldType.STRING))
+                .field(new CsvField(getInt(fields[0]), CsvFieldDataType.INTEGER))
+                .field(new CsvField(fields[1], CsvFieldDataType.STRING))
+                .field(new CsvField(fields[2], CsvFieldDataType.STRING))
+                .field(new CsvField(fields[3], CsvFieldDataType.STRING))
+                .field(new CsvField(fields[4], CsvFieldDataType.STRING))
+                .field(new CsvField(fields[5], CsvFieldDataType.STRING))
+                .field(new CsvField(getDouble(fields[6]), CsvFieldDataType.DOUBLE))
+                .field(new CsvField(getDouble(fields[7]), CsvFieldDataType.DOUBLE))
+                .field(new CsvField(getInt(fields[8]), CsvFieldDataType.INTEGER))
+                .field(new CsvField(tryGetDouble(fields[9]), CsvFieldDataType.NULLABLE_DOUBLE))
+                .field(new CsvField(fields[10], CsvFieldDataType.STRING))
+                .field(new CsvField(fields[11], CsvFieldDataType.STRING))
+                .field(new CsvField(fields[12], CsvFieldDataType.STRING))
+                .field(new CsvField(fields[12], CsvFieldDataType.STRING))
                 .build();
     }
 

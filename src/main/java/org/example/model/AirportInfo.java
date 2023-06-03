@@ -20,11 +20,15 @@ public class AirportInfo {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
-        sb.append(name);
+        sb.append('"').append(name).append('"');
         sb.append('[');
         for (int i = 0, fieldsSize = fields.size(); i < fieldsSize; i++) {
             var field = fields.get(i);
-            sb.append(field.getValueAsString());
+            if (field.getFieldDataTypeType().equals(CsvFieldDataType.STRING)) {
+                sb.append('"').append(field.getValueAsString()).append('"');
+            } else {
+                sb.append(field.getValueAsString());
+            }
 
             if (i < fieldsSize - 1) {
                 sb.append(", ");

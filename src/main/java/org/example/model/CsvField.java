@@ -1,28 +1,30 @@
 package org.example.model;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
-@Getter
-@RequiredArgsConstructor
 public class CsvField {
     private final Object value;
-    private final CsvFieldType fieldType;
+    private final CsvFieldDataType<?> fieldDataTypeType;
+
+    public <T> CsvField(T value, CsvFieldDataType<T> fieldDataTypeType) {
+        this.value = value;
+        this.fieldDataTypeType = fieldDataTypeType;
+    }
 
     public int getIntValue() {
-        if (fieldType != CsvFieldType.INTEGER && fieldType != CsvFieldType.NULLABLE_INTEGER)
+        if (!fieldDataTypeType.equals(CsvFieldDataType.INTEGER)
+                && !fieldDataTypeType.equals(CsvFieldDataType.NULLABLE_INTEGER))
             throw new ClassCastException();
-        return (Integer) value;
+        return (int) value;
     }
 
     public double getDoubleValue() {
-        if (fieldType != CsvFieldType.DOUBLE && fieldType != CsvFieldType.NULLABLE_DOUBLE)
+        if (!fieldDataTypeType.equals(CsvFieldDataType.DOUBLE)
+                && !fieldDataTypeType.equals(CsvFieldDataType.NULLABLE_DOUBLE))
             throw new ClassCastException();
-        return (Double) value;
+        return (double) value;
     }
 
     public String getStringValue() {
-        if (fieldType != CsvFieldType.STRING) throw new ClassCastException();
+        if (fieldDataTypeType != CsvFieldDataType.STRING) throw new ClassCastException();
         return (String) value;
     }
 
@@ -31,7 +33,7 @@ public class CsvField {
     }
 
     public String getValueAsString() {
-        if (valueIsNull()) return "N";
+        if (valueIsNull()) return "\\N";
         return value.toString();
     }
 }
