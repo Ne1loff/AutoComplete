@@ -10,13 +10,15 @@ public class CsvField {
     private final CsvFieldType fieldType;
 
     public int getIntValue() {
-        if (fieldType != CsvFieldType.INTEGER) throw new ClassCastException();
-        return (int) value;
+        if (fieldType != CsvFieldType.INTEGER && fieldType != CsvFieldType.NULLABLE_INTEGER)
+            throw new ClassCastException();
+        return (Integer) value;
     }
 
     public double getDoubleValue() {
-        if (fieldType != CsvFieldType.DOUBLE) throw new ClassCastException();
-        return (double) value;
+        if (fieldType != CsvFieldType.DOUBLE && fieldType != CsvFieldType.NULLABLE_DOUBLE)
+            throw new ClassCastException();
+        return (Double) value;
     }
 
     public String getStringValue() {

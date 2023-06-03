@@ -67,7 +67,10 @@ public class SimpleCsvRowParser implements CsvRowParser {
         for (int i = 0; i < charArray.length; i++) {
             char ch = charArray[i];
 
-            if (ch == '\\' && charArray[(i + 1) % charArray.length] == '"') continue;
+            if (ch == '\\' && charArray[(i + 1) % charArray.length] == '"') {
+                builder.append('"');
+                continue;
+            }
 
             if (ch == '"') {
                 wasOpenDoubleQuotes = !wasOpenDoubleQuotes;
