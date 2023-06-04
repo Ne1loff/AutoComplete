@@ -10,6 +10,8 @@ import java.util.List;
 
 public interface Reader extends Closeable {
     void open(String filename, int bufferSize) throws FileNotFoundException;
+
     List<String> getLines(Collection<Long> positions) throws IOException;
-    List<FileLine> getFileLinesFormBuffer(String fileName) throws IOException;
+
+    List<FileLine> getFileLinesFormBuffer() throws IOException;
 }

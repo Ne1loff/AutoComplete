@@ -2,6 +2,7 @@ package org.example.parser.rpn;
 
 import org.example.model.AirportInfo;
 import org.example.model.CsvField;
+import org.example.model.CsvFieldDataType;
 import org.example.parser.rpn.token.*;
 
 import java.util.Deque;
@@ -46,7 +47,7 @@ public class StackMachineImpl implements StackMachine {
             ComparativeOperationType type = expression.getComparativeOperationTypeType();
             var field = info.getField(expression.getFieldNumber() - 1);
 
-            if (Objects.requireNonNull(type) == ComparativeOperationType.EQUAL) {
+            if (type == ComparativeOperationType.EQUAL) {
                 return isEqual(field, expression.getValue());
             } else if (type == ComparativeOperationType.NOT_EQUAL) {
                 return isNotEqual(field, expression.getValue());
@@ -60,102 +61,110 @@ public class StackMachineImpl implements StackMachine {
     }
 
     private boolean isEqual(CsvField field, String value) {
-        var fieldType = field.getFieldType();
-        switch (fieldType) {
-            case NULLABLE_INTEGER:
-                if (field.valueIsNull()) {
-                    return false;
-                }
-            case INTEGER:
-                return field.getIntValue() == Integer.parseInt(value);
-            case NULLABLE_DOUBLE:
-                if (field.valueIsNull()) {
-                    return false;
-                }
-            case DOUBLE:
-                var first = field.getDoubleValue();
-                var second = Double.parseDouble(value);
-                return Double.compare(first, second) == 0;
-            case STRING:
-                return field.getStringValue().equals(value);
+        var fieldType = field.getFieldDataTypeType();
 
-            default:
-                throw new IllegalStateException("Unexpected value: " + fieldType);
+        if (fieldType == CsvFieldDataType.NULLABLE_INTEGER) {
+            if (field.valueIsNull()) return false;
+            return compareInt(field.getIntValue(), Integer.parseInt(value)) == 0;
+
+        } else if (fieldType == CsvFieldDataType.INTEGER) {
+            return compareInt(field.getIntValue(), Integer.parseInt(value)) == 0;
+
+        } else if (fieldType == CsvFieldDataType.NULLABLE_DOUBLE) {
+            if (field.valueIsNull()) return false;
+            return compareDouble(field.getDoubleValue(), Double.parseDouble(value)) == 0;
+
+        } else if (fieldType == CsvFieldDataType.DOUBLE) {
+            return compareDouble(field.getDoubleValue(), Double.parseDouble(value)) == 0;
+
+        } else if (fieldType == CsvFieldDataType.STRING) {
+            return compareString(field.getStringValue(), value);
         }
+
+        throw new IllegalStateException("Unexpected value: " + fieldType);
     }
 
     private boolean isNotEqual(CsvField field, String value) {
-        var fieldType = field.getFieldType();
-        switch (fieldType) {
-            case NULLABLE_INTEGER:
-                if (field.valueIsNull()) {
-                    return false;
-                }
-            case INTEGER:
-                return field.getIntValue() != Integer.parseInt(value);
-            case NULLABLE_DOUBLE:
-                if (field.valueIsNull()) {
-                    return false;
-                }
-            case DOUBLE:
-                var first = field.getDoubleValue();
-                var second = Double.parseDouble(value);
-                return Double.compare(first, second) != 0;
-            case STRING:
-                return !(field.getStringValue().equals(value));
-            default:
-                throw new IllegalStateException("Unexpected value: " + fieldType);
+        var fieldType = field.getFieldDataTypeType();
+
+        if (fieldType == CsvFieldDataType.NULLABLE_INTEGER) {
+            if (field.valueIsNull()) return false;
+            return compareInt(field.getIntValue(), Integer.parseInt(value)) != 0;
+
+        } else if (fieldType == CsvFieldDataType.INTEGER) {
+            return compareInt(field.getIntValue(), Integer.parseInt(value)) != 0;
+
+        } else if (fieldType == CsvFieldDataType.NULLABLE_DOUBLE) {
+            if (field.valueIsNull()) return false;
+            return compareDouble(field.getDoubleValue(), Double.parseDouble(value)) != 0;
+
+        } else if (fieldType == CsvFieldDataType.DOUBLE) {
+            return compareDouble(field.getDoubleValue(), Double.parseDouble(value)) != 0;
+
+        } else if (fieldType == CsvFieldDataType.STRING) {
+            return !compareString(field.getStringValue(), value);
         }
+
+        throw new IllegalStateException("Unexpected value: " + fieldType);
     }
 
     private boolean isGreaterThan(CsvField field, String value) {
-        var fieldType = field.getFieldType();
-        switch (fieldType) {
-            case NULLABLE_INTEGER:
-                if (field.valueIsNull()) {
-                    return false;
-                }
-            case INTEGER:
-                return field.getIntValue() > Integer.parseInt(value);
-            case NULLABLE_DOUBLE:
-                if (field.valueIsNull()) {
-                    return false;
-                }
-            case DOUBLE:
-                var first = field.getDoubleValue();
-                var second = Double.parseDouble(value);
-                return Double.compare(first, second) == 1;
-            case STRING:
-                throw new IllegalStateException("It is impossible to find out which line is bigger");
+        var fieldType = field.getFieldDataTypeType();
 
-            default:
-                throw new IllegalStateException("Unexpected value: " + fieldType);
+        if (fieldType == CsvFieldDataType.NULLABLE_INTEGER) {
+            if (field.valueIsNull()) return false;
+            return compareInt(field.getIntValue(), Integer.parseInt(value)) == 1;
 
+        } else if (fieldType == CsvFieldDataType.INTEGER) {
+            return compareInt(field.getIntValue(), Integer.parseInt(value)) == 1;
+
+        } else if (fieldType == CsvFieldDataType.NULLABLE_DOUBLE) {
+            if (field.valueIsNull()) return false;
+            return compareDouble(field.getDoubleValue(), Double.parseDouble(value)) == 1;
+
+        } else if (fieldType == CsvFieldDataType.DOUBLE) {
+            return compareDouble(field.getDoubleValue(), Double.parseDouble(value)) == 1;
+
+        } else if (fieldType == CsvFieldDataType.STRING) {
+            throw new IllegalStateException("It is impossible to find out which line is bigger");
         }
+
+        throw new IllegalStateException("Unexpected value: " + fieldType);
     }
 
     private boolean isLessThan(CsvField field, String value) {
-        var fieldType = field.getFieldType();
-        switch (fieldType) {
-            case NULLABLE_INTEGER:
-                if (field.valueIsNull()) {
-                    return false;
-                }
-            case INTEGER:
-                return field.getIntValue() < Integer.parseInt(value);
-            case NULLABLE_DOUBLE:
-                if (field.valueIsNull()) {
-                    return false;
-                }
-            case DOUBLE:
-                var first = field.getDoubleValue();
-                var second = Double.parseDouble(value);
-                return Double.compare(first, second) == -1;
-            case STRING:
-                throw new IllegalStateException("It is impossible to find out which line is smaller");
+        var fieldType = field.getFieldDataTypeType();
 
-            default:
-                throw new IllegalStateException("Unexpected value: " + fieldType);
+        if (fieldType == CsvFieldDataType.NULLABLE_INTEGER) {
+            if (field.valueIsNull()) return false;
+            return compareInt(field.getIntValue(), Integer.parseInt(value)) == -1;
+
+        } else if (fieldType == CsvFieldDataType.INTEGER) {
+            return compareInt(field.getIntValue(), Integer.parseInt(value)) == -1;
+
+        } else if (fieldType == CsvFieldDataType.NULLABLE_DOUBLE) {
+            if (field.valueIsNull()) return false;
+            return compareDouble(field.getDoubleValue(), Double.parseDouble(value)) == -1;
+
+        } else if (fieldType == CsvFieldDataType.DOUBLE) {
+            return compareDouble(field.getDoubleValue(), Double.parseDouble(value)) == -1;
+
+        } else if (fieldType == CsvFieldDataType.STRING) {
+            throw new IllegalStateException("It is impossible to find out which line is smaller");
         }
+
+        throw new IllegalStateException("Unexpected value: " + fieldType);
+    }
+
+    private int compareInt(int first, int second) {
+        return Integer.compare(first, second);
+    }
+
+    private int compareDouble(double first, double second) {
+        return Double.compare(first, second);
+    }
+
+    private boolean compareString(String first, String second) {
+        return first.equals(second);
     }
 }

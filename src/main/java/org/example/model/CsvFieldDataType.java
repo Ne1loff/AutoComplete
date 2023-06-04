@@ -1,7 +1,5 @@
 package org.example.model;
 
-import java.util.Optional;
-
 public final class CsvFieldDataType<T> {
 
     public static final CsvFieldDataType<Integer> INTEGER = new CsvFieldDataType<>(Integer.class);

@@ -3,8 +3,14 @@ package org.example.searcher.indexer;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.core.SimpleAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.document.*;
-import org.apache.lucene.index.*;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
+import org.apache.lucene.document.StoredField;
+import org.apache.lucene.document.StringField;
+import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -13,6 +19,7 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import org.example.model.FileLine;
+import org.example.parser.CsvRowParser;
 import org.example.reader.Reader;
 
 import java.io.IOException;
@@ -31,8 +38,11 @@ public class LuceneIndexer implements Indexer {
 
     private final Reader reader;
 
-    public LuceneIndexer(Reader reader) {
+    private final CsvRowParser csvParser;
+
+    public LuceneIndexer(Reader reader, CsvRowParser csvParser) {
         this.reader = reader;
+        this.csvParser = csvParser;
         luceneDirectory = new RAMDirectory();
     }
 
@@ -44,7 +54,7 @@ public class LuceneIndexer implements Indexer {
             reader.open(fileName, 2048);
             IndexWriter writer = new IndexWriter(luceneDirectory, new IndexWriterConfig(analyzer));
 
-            while ((lines = reader.getFileLinesFormBuffer(fileName)) != null) {
+            while ((lines = reader.getFileLinesFormBuffer()) != null) {
                 for (FileLine line : lines) {
                     writer.addDocument(createDocument(line));
                 }
@@ -94,12 +104,7 @@ public class LuceneIndexer implements Indexer {
 
     private Document createDocument(FileLine line) {
         var content = line.getContent();
-        int firstCommaIndex = content.indexOf(",");
-        int secondCommaIndex = content.indexOf(",", firstCommaIndex + 1);
-
-        var airportName = content.substring(firstCommaIndex + 1, secondCommaIndex)
-                .trim()
-                .toLowerCase();
+        var airportName = csvParser.parseField(content, 1);
 
         Document document = new Document();
         document.add(new StringField(AIRPORT_FIELD, airportName, Field.Store.NO));

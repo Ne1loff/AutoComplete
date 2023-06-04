@@ -2,6 +2,7 @@ package org.example.searcher.indexer;
 
 import lombok.RequiredArgsConstructor;
 import org.example.model.FileLine;
+import org.example.parser.CsvRowParser;
 import org.example.reader.Reader;
 
 import java.io.IOException;
@@ -45,7 +46,6 @@ public class SimpleIndexer implements Indexer {
                     return result;
                 }
 
-                prefix = prefix.toLowerCase();
                 List<T> result = new ArrayList<>();
                 int i = Arrays.binarySearch(
                         indices,
@@ -79,14 +79,11 @@ public class SimpleIndexer implements Indexer {
                     var left = indices[j];
                     var right = indices[k];
 
-                    if (left.length() <= prefixLastCharNumber) {
+                    if (left.length() <= prefixLastCharNumber || left.charAt(prefixLastCharNumber) != prefixLastChar) {
                         start = j + 1;
                     }
 
-                    if (left.charAt(prefixLastCharNumber) != prefixLastChar) {
-                        start = j + 1;
-                    }
-                    if (right.charAt(prefixLastCharNumber) != prefixLastChar) {
+                    if (right.length() <= prefixLastCharNumber || right.charAt(prefixLastCharNumber) != prefixLastChar) {
                         end = k - 1;
                     }
                 }
@@ -123,16 +120,17 @@ public class SimpleIndexer implements Indexer {
     private final SimpleIndex<Long> index = new SimpleIndex<>();
 
     private final Reader reader;
+    private final CsvRowParser csvParser;
 
     @Override
     public void indexFile(String fileName) {
         List<FileLine> lines;
         try (reader) {
             reader.open(fileName, 2048);
-            while ((lines = reader.getFileLinesFormBuffer(fileName)) != null) {
+            while ((lines = reader.getFileLinesFormBuffer()) != null) {
                 for (FileLine line : lines) {
                     var content = line.getContent();
-                    var airportName = getName(content);
+                    var airportName = csvParser.parseField(content, 1);
                     index.putValue(airportName, line.getStartPosition());
                 }
             }
@@ -146,13 +144,5 @@ public class SimpleIndexer implements Indexer {
     @Override
     public List<Long> getIndexes(String value) {
         return index.getValuesByIndexPrefix(value);
-    }
-
-    private String getName(String content) {
-        int firstCommaIndex = content.indexOf(",");
-        int secondCommaIndex = content.indexOf(",", firstCommaIndex + 1);
-
-        return content.substring(firstCommaIndex + 1, secondCommaIndex)
-                .trim();
     }
 }

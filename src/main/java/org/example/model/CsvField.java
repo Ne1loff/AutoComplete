@@ -1,5 +1,8 @@
 package org.example.model;
 
+import lombok.Getter;
+
+@Getter
 public class CsvField {
     private final Object value;
     private final CsvFieldDataType<?> fieldDataTypeType;
@@ -10,21 +13,20 @@ public class CsvField {
     }
 
     public int getIntValue() {
-        if (!fieldDataTypeType.equals(CsvFieldDataType.INTEGER)
-                && !fieldDataTypeType.equals(CsvFieldDataType.NULLABLE_INTEGER))
+        if (fieldDataTypeType != CsvFieldDataType.INTEGER && fieldDataTypeType != CsvFieldDataType.NULLABLE_INTEGER)
             throw new ClassCastException();
-        return (int) value;
+        return (Integer) value;
     }
 
     public double getDoubleValue() {
-        if (!fieldDataTypeType.equals(CsvFieldDataType.DOUBLE)
-                && !fieldDataTypeType.equals(CsvFieldDataType.NULLABLE_DOUBLE))
+        if (fieldDataTypeType != CsvFieldDataType.DOUBLE && fieldDataTypeType != CsvFieldDataType.NULLABLE_DOUBLE)
             throw new ClassCastException();
-        return (double) value;
+        return (Double) value;
     }
 
     public String getStringValue() {
-        if (fieldDataTypeType != CsvFieldDataType.STRING) throw new ClassCastException();
+        if (fieldDataTypeType != CsvFieldDataType.STRING)
+            throw new ClassCastException();
         return (String) value;
     }
 

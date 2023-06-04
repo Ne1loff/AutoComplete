@@ -1,5 +1,6 @@
 package org.example.reader;
 
+import org.example.config.CsvConfig;
 import org.example.model.FileLine;
 
 import java.io.FileNotFoundException;
@@ -54,7 +55,7 @@ public class CsvReader implements Reader {
     }
 
     @Override
-    public List<FileLine> getFileLinesFormBuffer(String fileName) throws IOException {
+    public List<FileLine> getFileLinesFormBuffer() throws IOException {
         ensureOpen();
 
         var channel = reader.getChannel();
@@ -127,7 +128,7 @@ public class CsvReader implements Reader {
                         }
                         if (ch == ',' && !wasOpenDoubleQuotes) commaCounter++;
                     }
-                    if (commaCounter == 13) {
+                    if (commaCounter == CsvConfig.CSV_FIELD_COUNT - 1) {
                         return subBuff.toString();
                     }
                     start = i + 1;
@@ -148,7 +149,6 @@ public class CsvReader implements Reader {
 
                 builder.append(subSeq);
                 builder.deleteCharAt(builder.length() - 1);
-                replaceAllUselessDoubleQuotes(builder);
 
                 var byteBuff = getByteBuffer(subSeq);
                 int lineLength = byteBuff.limit() - byteBuff.position();
@@ -163,19 +163,5 @@ public class CsvReader implements Reader {
         }
 
         return result;
-    }
-
-    private void replaceAllUselessDoubleQuotes(StringBuilder builder) {
-
-        for (int i = 0; i < builder.length(); i++) {
-            char ch = builder.charAt(i);
-            if (ch == '\\' && builder.charAt((i + 1) % builder.length()) == '"') {
-                builder.deleteCharAt(i);
-                continue;
-            }
-            if (ch == '"') {
-                builder.deleteCharAt(i);
-            }
-        }
     }
 }
