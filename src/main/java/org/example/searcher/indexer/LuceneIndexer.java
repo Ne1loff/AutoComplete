@@ -25,6 +25,7 @@ import org.example.reader.Reader;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -95,6 +96,7 @@ public class LuceneIndexer implements Indexer {
                                 return new LineInfo(linePos, lineLength);
                             }
                     )
+                    .sorted(Comparator.comparing(LineInfo::getStartPosition))
                     .collect(Collectors.toList());
         } catch (Exception e) {
             throw new RuntimeException(e);
