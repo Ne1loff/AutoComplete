@@ -8,6 +8,7 @@ import org.example.parser.CsvRowParser;
 import org.example.reader.Reader;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -38,6 +39,8 @@ public class TrieIndexer implements Indexer {
 
     @Override
     public List<LineInfo> findValuesByPrefix(String value) {
-        return trie.getValueSuggestions(value);
+        List<LineInfo> result = trie.getValueSuggestions(value);
+        result.sort(Comparator.comparing(LineInfo::getStartPosition));
+        return result;
     }
 }
