@@ -1,7 +1,8 @@
 package org.example.searcher.indexer;
 
 import lombok.SneakyThrows;
-import org.example.model.FileLine;
+import org.example.model.file.FileLine;
+import org.example.model.file.LineInfo;
 import org.example.parser.CsvRowParser;
 import org.example.parser.SimpleCsvRowParser;
 import org.example.reader.CsvReader;
@@ -11,7 +12,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 class IndexerTest {
@@ -39,18 +40,18 @@ class IndexerTest {
 
         Mockito.when(reader.getFileLinesFormBuffer())
                 .thenReturn(List.of(
-                        new FileLine(lines.get(0), 10, 0),
-                        new FileLine(lines.get(1), 20, 0),
-                        new FileLine(lines.get(2), 30, 0),
-                        new FileLine(lines.get(3), 40, 0),
-                        new FileLine(lines.get(4), 50, 0),
-                        new FileLine(lines.get(5), 60, 0),
-                        new FileLine(lines.get(6), 70, 0),
-                        new FileLine(lines.get(7), 80, 0),
-                        new FileLine(lines.get(8), 90, 0),
-                        new FileLine(lines.get(9), 100, 0),
-                        new FileLine(lines.get(10), 110, 0),
-                        new FileLine(lines.get(11), 120, 0)
+                        new FileLine(lines.get(0), new LineInfo(10, 0)),
+                        new FileLine(lines.get(1), new LineInfo(20, 0)),
+                        new FileLine(lines.get(2), new LineInfo(30, 0)),
+                        new FileLine(lines.get(3), new LineInfo(40, 0)),
+                        new FileLine(lines.get(4), new LineInfo(50, 0)),
+                        new FileLine(lines.get(5), new LineInfo(60, 0)),
+                        new FileLine(lines.get(6), new LineInfo(70, 0)),
+                        new FileLine(lines.get(7), new LineInfo(80, 0)),
+                        new FileLine(lines.get(8), new LineInfo(90, 0)),
+                        new FileLine(lines.get(9), new LineInfo(100, 0)),
+                        new FileLine(lines.get(10), new LineInfo(110, 0)),
+                        new FileLine(lines.get(11), new LineInfo(120, 0))
                 )).thenReturn(null);
 
         return reader;
@@ -66,57 +67,61 @@ class IndexerTest {
 
     @Test
     void testPrefixMo() {
-        List<Long> indexes = indexer.getIndexes("Mo");
-        Collections.sort(indexes);
+        List<LineInfo> indexes = indexer.findValuesByPrefix("Mo");
+        indexes.sort(Comparator.comparing(LineInfo::getStartPosition));
 
         List<Long> expected = List.of(40L);
 
         Assertions.assertEquals(expected.size(), indexes.size());
 
         for (int i = 0; i < expected.size(); i++) {
-            Assertions.assertEquals(expected.get(i), indexes.get(i));
+            var actual = indexes.get(i).getStartPosition();
+            Assertions.assertEquals(expected.get(i), actual);
         }
     }
 
     @Test
     void testPrefixFoggiaBQ() {
-        List<Long> indexes = indexer.getIndexes("Foggia \"");
-        Collections.sort(indexes);
+        List<LineInfo> indexes = indexer.findValuesByPrefix("Foggia \"");
+        indexes.sort(Comparator.comparing(LineInfo::getStartPosition));
 
         List<Long> expected = List.of(100L);
 
         Assertions.assertEquals(expected.size(), indexes.size());
 
         for (int i = 0; i < expected.size(); i++) {
-            Assertions.assertEquals(expected.get(i), indexes.get(i));
+            var actual = indexes.get(i).getStartPosition();
+            Assertions.assertEquals(expected.get(i), actual);
         }
     }
 
     @Test
     void testPrefixGo() {
-        List<Long> indexes = indexer.getIndexes("Go");
-        Collections.sort(indexes);
+        List<LineInfo> indexes = indexer.findValuesByPrefix("Go");
+        indexes.sort(Comparator.comparing(LineInfo::getStartPosition));
 
         List<Long> expected = List.of(10L, 20L);
 
         Assertions.assertEquals(expected.size(), indexes.size());
 
         for (int i = 0; i < expected.size(); i++) {
-            Assertions.assertEquals(expected.get(i), indexes.get(i));
+            var actual = indexes.get(i).getStartPosition();
+            Assertions.assertEquals(expected.get(i), actual);
         }
     }
 
     @Test
     void testPrefixG() {
-        List<Long> indexes = indexer.getIndexes("G");
-        Collections.sort(indexes);
+        List<LineInfo> indexes = indexer.findValuesByPrefix("G");
+        indexes.sort(Comparator.comparing(LineInfo::getStartPosition));
 
         List<Long> expected = List.of(10L, 20L, 50L, 60L, 70L, 80L, 90L, 120L);
 
         Assertions.assertEquals(expected.size(), indexes.size());
 
         for (int i = 0; i < expected.size(); i++) {
-            Assertions.assertEquals(expected.get(i), indexes.get(i));
+            var actual = indexes.get(i).getStartPosition();
+            Assertions.assertEquals(expected.get(i), actual);
         }
     }
 

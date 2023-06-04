@@ -1,8 +1,8 @@
 package org.example.parser;
 
 import org.example.model.AirportInfo;
-import org.example.model.CsvField;
-import org.example.model.CsvFieldDataType;
+import org.example.model.csv.CsvField;
+import org.example.model.csv.CsvFieldDataType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -21,38 +21,39 @@ class CsvRowParserTest {
         List<AirportInfo> infos = parser.parseRows(rows);
 
         var expected = List.of(
-                AirportInfo.builder().name("Goroka Airport")
-                        .field(new CsvField(1, CsvFieldDataType.INTEGER))
-                        .field(new CsvField("Goroka Airport", CsvFieldDataType.STRING))
-                        .field(new CsvField("Goroka", CsvFieldDataType.STRING))
-                        .field(new CsvField("Papua New Guinea", CsvFieldDataType.STRING))
-                        .field(new CsvField("GKA", CsvFieldDataType.STRING))
-                        .field(new CsvField("AYGA", CsvFieldDataType.STRING))
-                        .field(new CsvField(-6.081689834590001, CsvFieldDataType.DOUBLE))
-                        .field(new CsvField(145.391998291, CsvFieldDataType.DOUBLE))
-                        .field(new CsvField(5282, CsvFieldDataType.INTEGER))
-                        .field(new CsvField(10.0, CsvFieldDataType.NULLABLE_DOUBLE))
-                        .field(new CsvField("U", CsvFieldDataType.STRING))
-                        .field(new CsvField("Pacific/Port_Moresby", CsvFieldDataType.STRING))
-                        .field(new CsvField("airport", CsvFieldDataType.STRING))
-                        .field(new CsvField("OurAirports", CsvFieldDataType.STRING))
-                        .build(),
-                AirportInfo.builder().name("Godthaab / Nuuk Airport")
-                        .field(new CsvField(8, CsvFieldDataType.INTEGER))
-                        .field(new CsvField("Godthaab / Nuuk Airport", CsvFieldDataType.STRING))
-                        .field(new CsvField("Godthaab", CsvFieldDataType.STRING))
-                        .field(new CsvField("Greenland", CsvFieldDataType.STRING))
-                        .field(new CsvField("GOH", CsvFieldDataType.STRING))
-                        .field(new CsvField("BGGH", CsvFieldDataType.STRING))
-                        .field(new CsvField(64.19090271, CsvFieldDataType.DOUBLE))
-                        .field(new CsvField(-51.6781005859, CsvFieldDataType.DOUBLE))
-                        .field(new CsvField(283, CsvFieldDataType.INTEGER))
-                        .field(new CsvField(-3.0, CsvFieldDataType.NULLABLE_DOUBLE))
-                        .field(new CsvField("E", CsvFieldDataType.STRING))
-                        .field(new CsvField("America/Godthab", CsvFieldDataType.STRING))
-                        .field(new CsvField("airport", CsvFieldDataType.STRING))
-                        .field(new CsvField("OurAirports", CsvFieldDataType.STRING))
-                        .build()
+                new AirportInfo("Goroka Airport", new CsvField[]{
+                        new CsvField(1, CsvFieldDataType.INTEGER),
+                        new CsvField("Goroka Airport", CsvFieldDataType.STRING),
+                        new CsvField("Goroka", CsvFieldDataType.STRING),
+                        new CsvField("Papua New Guinea", CsvFieldDataType.STRING),
+                        new CsvField("GKA", CsvFieldDataType.STRING),
+                        new CsvField("AYGA", CsvFieldDataType.STRING),
+                        new CsvField(-6.081689834590001, CsvFieldDataType.DOUBLE),
+                        new CsvField(145.391998291, CsvFieldDataType.DOUBLE),
+                        new CsvField(5282, CsvFieldDataType.INTEGER),
+                        new CsvField(10.0, CsvFieldDataType.NULLABLE_DOUBLE),
+                        new CsvField("U", CsvFieldDataType.STRING),
+                        new CsvField("Pacific/Port_Moresby", CsvFieldDataType.STRING),
+                        new CsvField("airport", CsvFieldDataType.STRING),
+                        new CsvField("OurAirports", CsvFieldDataType.STRING)
+                }),
+                new AirportInfo("Godthaab / Nuuk Airport", new CsvField[]{
+                        new CsvField(8, CsvFieldDataType.INTEGER),
+                        new CsvField("Godthaab / Nuuk Airport", CsvFieldDataType.STRING),
+                        new CsvField("Godthaab", CsvFieldDataType.STRING),
+                        new CsvField("Greenland", CsvFieldDataType.STRING),
+                        new CsvField("GOH", CsvFieldDataType.STRING),
+                        new CsvField("BGGH", CsvFieldDataType.STRING),
+                        new CsvField(64.19090271, CsvFieldDataType.DOUBLE),
+                        new CsvField(-51.6781005859, CsvFieldDataType.DOUBLE),
+                        new CsvField(283, CsvFieldDataType.INTEGER),
+                        new CsvField(-3.0, CsvFieldDataType.NULLABLE_DOUBLE),
+                        new CsvField("E", CsvFieldDataType.STRING),
+                        new CsvField("America/Godthab", CsvFieldDataType.STRING),
+                        new CsvField("airport", CsvFieldDataType.STRING),
+                        new CsvField("OurAirports", CsvFieldDataType.STRING)
+                })
+
         );
 
         for (int i = 0; i < infos.size(); i++) {
@@ -67,11 +68,11 @@ class CsvRowParserTest {
 
                 boolean isInteger =
                         expectedField.getFieldDataTypeType() == CsvFieldDataType.NULLABLE_INTEGER
-                        || expectedField.getFieldDataTypeType() == CsvFieldDataType.INTEGER;
+                                || expectedField.getFieldDataTypeType() == CsvFieldDataType.INTEGER;
 
                 boolean isBoolean = !isInteger &&
                         (expectedField.getFieldDataTypeType() == CsvFieldDataType.NULLABLE_DOUBLE
-                        || expectedField.getFieldDataTypeType() == CsvFieldDataType.DOUBLE);
+                                || expectedField.getFieldDataTypeType() == CsvFieldDataType.DOUBLE);
 
                 boolean isString = !isBoolean &&
                         expectedField.getFieldDataTypeType() == CsvFieldDataType.STRING;
@@ -95,38 +96,39 @@ class CsvRowParserTest {
         );
         List<AirportInfo> infos = parser.parseRows(rows);
         var expected = List.of(
-                AirportInfo.builder().name("Sandefjord Airport, Torp")
-                        .field(new CsvField(664, CsvFieldDataType.INTEGER))
-                        .field(new CsvField("Sandefjord Airport, Torp", CsvFieldDataType.STRING))
-                        .field(new CsvField("Sandefjord", CsvFieldDataType.STRING))
-                        .field(new CsvField("Norway", CsvFieldDataType.STRING))
-                        .field(new CsvField("TRF", CsvFieldDataType.STRING))
-                        .field(new CsvField("ENTO", CsvFieldDataType.STRING))
-                        .field(new CsvField(59.1866989136, CsvFieldDataType.DOUBLE))
-                        .field(new CsvField(10.258600235, CsvFieldDataType.DOUBLE))
-                        .field(new CsvField(286, CsvFieldDataType.INTEGER))
-                        .field(new CsvField(1.0, CsvFieldDataType.NULLABLE_DOUBLE))
-                        .field(new CsvField("E", CsvFieldDataType.STRING))
-                        .field(new CsvField("Europe/Oslo", CsvFieldDataType.STRING))
-                        .field(new CsvField("airport", CsvFieldDataType.STRING))
-                        .field(new CsvField("OurAirports", CsvFieldDataType.STRING))
-                        .build(),
-                AirportInfo.builder().name("Mo i Rana Airport, Røssvoll")
-                        .field(new CsvField(5582, CsvFieldDataType.INTEGER))
-                        .field(new CsvField("Mo i Rana Airport, Røssvoll", CsvFieldDataType.STRING))
-                        .field(new CsvField("Mo i Rana", CsvFieldDataType.STRING))
-                        .field(new CsvField("Norway", CsvFieldDataType.STRING))
-                        .field(new CsvField("MQN", CsvFieldDataType.STRING))
-                        .field(new CsvField("ENRA", CsvFieldDataType.STRING))
-                        .field(new CsvField(66.363899230957, CsvFieldDataType.DOUBLE))
-                        .field(new CsvField(14.301400184631, CsvFieldDataType.DOUBLE))
-                        .field(new CsvField(229, CsvFieldDataType.INTEGER))
-                        .field(new CsvField(1.0, CsvFieldDataType.NULLABLE_DOUBLE))
-                        .field(new CsvField("E", CsvFieldDataType.STRING))
-                        .field(new CsvField("Europe/Oslo", CsvFieldDataType.STRING))
-                        .field(new CsvField("airport", CsvFieldDataType.STRING))
-                        .field(new CsvField("OurAirports", CsvFieldDataType.STRING))
-                        .build()
+                new AirportInfo("Sandefjord Airport, Torp", new CsvField[]{
+                        new CsvField(664, CsvFieldDataType.INTEGER),
+                        new CsvField("Sandefjord Airport, Torp", CsvFieldDataType.STRING),
+                        new CsvField("Sandefjord", CsvFieldDataType.STRING),
+                        new CsvField("Norway", CsvFieldDataType.STRING),
+                        new CsvField("TRF", CsvFieldDataType.STRING),
+                        new CsvField("ENTO", CsvFieldDataType.STRING),
+                        new CsvField(59.1866989136, CsvFieldDataType.DOUBLE),
+                        new CsvField(10.258600235, CsvFieldDataType.DOUBLE),
+                        new CsvField(286, CsvFieldDataType.INTEGER),
+                        new CsvField(1.0, CsvFieldDataType.NULLABLE_DOUBLE),
+                        new CsvField("E", CsvFieldDataType.STRING),
+                        new CsvField("Europe/Oslo", CsvFieldDataType.STRING),
+                        new CsvField("airport", CsvFieldDataType.STRING),
+                        new CsvField("OurAirports", CsvFieldDataType.STRING)
+                }),
+
+                new AirportInfo("Mo i Rana Airport, Røssvoll", new CsvField[]{
+                        new CsvField(5582, CsvFieldDataType.INTEGER),
+                        new CsvField("Mo i Rana Airport, Røssvoll", CsvFieldDataType.STRING),
+                        new CsvField("Mo i Rana", CsvFieldDataType.STRING),
+                        new CsvField("Norway", CsvFieldDataType.STRING),
+                        new CsvField("MQN", CsvFieldDataType.STRING),
+                        new CsvField("ENRA", CsvFieldDataType.STRING),
+                        new CsvField(66.363899230957, CsvFieldDataType.DOUBLE),
+                        new CsvField(14.301400184631, CsvFieldDataType.DOUBLE),
+                        new CsvField(229, CsvFieldDataType.INTEGER),
+                        new CsvField(1.0, CsvFieldDataType.NULLABLE_DOUBLE),
+                        new CsvField("E", CsvFieldDataType.STRING),
+                        new CsvField("Europe/Oslo", CsvFieldDataType.STRING),
+                        new CsvField("airport", CsvFieldDataType.STRING),
+                        new CsvField("OurAirports", CsvFieldDataType.STRING)
+                })
         );
 
         for (int i = 0; i < infos.size(); i++) {
@@ -140,11 +142,11 @@ class CsvRowParserTest {
 
                 boolean isInteger =
                         expectedField.getFieldDataTypeType() == CsvFieldDataType.NULLABLE_INTEGER
-                        || expectedField.getFieldDataTypeType() == CsvFieldDataType.INTEGER;
+                                || expectedField.getFieldDataTypeType() == CsvFieldDataType.INTEGER;
 
                 boolean isBoolean = !isInteger &&
                         (expectedField.getFieldDataTypeType() == CsvFieldDataType.NULLABLE_DOUBLE
-                        || expectedField.getFieldDataTypeType() == CsvFieldDataType.DOUBLE);
+                                || expectedField.getFieldDataTypeType() == CsvFieldDataType.DOUBLE);
 
                 boolean isString = !isBoolean &&
                         expectedField.getFieldDataTypeType() == CsvFieldDataType.STRING;
@@ -168,38 +170,39 @@ class CsvRowParserTest {
         );
         List<AirportInfo> infos = parser.parseRows(rows);
         var expected = List.of(
-                AirportInfo.builder().name("Foggia \"Gino Lisa\" Airport")
-                        .field(new CsvField(1502, CsvFieldDataType.INTEGER))
-                        .field(new CsvField("Foggia \"Gino Lisa\" Airport", CsvFieldDataType.STRING))
-                        .field(new CsvField("Foggia", CsvFieldDataType.STRING))
-                        .field(new CsvField("Italy", CsvFieldDataType.STRING))
-                        .field(new CsvField("FOG", CsvFieldDataType.STRING))
-                        .field(new CsvField("LIBF", CsvFieldDataType.STRING))
-                        .field(new CsvField(41.432899, CsvFieldDataType.DOUBLE))
-                        .field(new CsvField(15.535, CsvFieldDataType.DOUBLE))
-                        .field(new CsvField(265, CsvFieldDataType.INTEGER))
-                        .field(new CsvField(1.0, CsvFieldDataType.NULLABLE_DOUBLE))
-                        .field(new CsvField("E", CsvFieldDataType.STRING))
-                        .field(new CsvField("Europe/Rome", CsvFieldDataType.STRING))
-                        .field(new CsvField("airport", CsvFieldDataType.STRING))
-                        .field(new CsvField("OurAirports", CsvFieldDataType.STRING))
-                        .build(),
-                AirportInfo.builder().name("Taranto-Grottaglie \"Marcello Arlotta\" Airport")
-                        .field(new CsvField(1503, CsvFieldDataType.INTEGER))
-                        .field(new CsvField("Taranto-Grottaglie \"Marcello Arlotta\" Airport", CsvFieldDataType.STRING))
-                        .field(new CsvField("Grottaglie", CsvFieldDataType.STRING))
-                        .field(new CsvField("Italy", CsvFieldDataType.STRING))
-                        .field(new CsvField("TAR", CsvFieldDataType.STRING))
-                        .field(new CsvField("LIBG", CsvFieldDataType.STRING))
-                        .field(new CsvField(40.517502, CsvFieldDataType.DOUBLE))
-                        .field(new CsvField(17.4032, CsvFieldDataType.DOUBLE))
-                        .field(new CsvField(215, CsvFieldDataType.INTEGER))
-                        .field(new CsvField(1.0, CsvFieldDataType.NULLABLE_DOUBLE))
-                        .field(new CsvField("E", CsvFieldDataType.STRING))
-                        .field(new CsvField("Europe/Rome", CsvFieldDataType.STRING))
-                        .field(new CsvField("airport", CsvFieldDataType.STRING))
-                        .field(new CsvField("OurAirports", CsvFieldDataType.STRING))
-                        .build()
+                new AirportInfo("Foggia \"Gino Lisa\" Airport", new CsvField[]{
+                        new CsvField(1502, CsvFieldDataType.INTEGER),
+                        new CsvField("Foggia \"Gino Lisa\" Airport", CsvFieldDataType.STRING),
+                        new CsvField("Foggia", CsvFieldDataType.STRING),
+                        new CsvField("Italy", CsvFieldDataType.STRING),
+                        new CsvField("FOG", CsvFieldDataType.STRING),
+                        new CsvField("LIBF", CsvFieldDataType.STRING),
+                        new CsvField(41.432899, CsvFieldDataType.DOUBLE),
+                        new CsvField(15.535, CsvFieldDataType.DOUBLE),
+                        new CsvField(265, CsvFieldDataType.INTEGER),
+                        new CsvField(1.0, CsvFieldDataType.NULLABLE_DOUBLE),
+                        new CsvField("E", CsvFieldDataType.STRING),
+                        new CsvField("Europe/Rome", CsvFieldDataType.STRING),
+                        new CsvField("airport", CsvFieldDataType.STRING),
+                        new CsvField("OurAirports", CsvFieldDataType.STRING)
+                }),
+
+                new AirportInfo("Taranto-Grottaglie \"Marcello Arlotta\" Airport", new CsvField[]{
+                        new CsvField(1503, CsvFieldDataType.INTEGER),
+                        new CsvField("Taranto-Grottaglie \"Marcello Arlotta\" Airport", CsvFieldDataType.STRING),
+                        new CsvField("Grottaglie", CsvFieldDataType.STRING),
+                        new CsvField("Italy", CsvFieldDataType.STRING),
+                        new CsvField("TAR", CsvFieldDataType.STRING),
+                        new CsvField("LIBG", CsvFieldDataType.STRING),
+                        new CsvField(40.517502, CsvFieldDataType.DOUBLE),
+                        new CsvField(17.4032, CsvFieldDataType.DOUBLE),
+                        new CsvField(215, CsvFieldDataType.INTEGER),
+                        new CsvField(1.0, CsvFieldDataType.NULLABLE_DOUBLE),
+                        new CsvField("E", CsvFieldDataType.STRING),
+                        new CsvField("Europe/Rome", CsvFieldDataType.STRING),
+                        new CsvField("airport", CsvFieldDataType.STRING),
+                        new CsvField("OurAirports", CsvFieldDataType.STRING)
+                })
         );
 
         for (int i = 0; i < infos.size(); i++) {
@@ -213,11 +216,11 @@ class CsvRowParserTest {
 
                 boolean isInteger =
                         expectedField.getFieldDataTypeType() == CsvFieldDataType.NULLABLE_INTEGER
-                        || expectedField.getFieldDataTypeType() == CsvFieldDataType.INTEGER;
+                                || expectedField.getFieldDataTypeType() == CsvFieldDataType.INTEGER;
 
                 boolean isBoolean = !isInteger &&
                         (expectedField.getFieldDataTypeType() == CsvFieldDataType.NULLABLE_DOUBLE
-                        || expectedField.getFieldDataTypeType() == CsvFieldDataType.DOUBLE);
+                                || expectedField.getFieldDataTypeType() == CsvFieldDataType.DOUBLE);
 
                 boolean isString = !isBoolean &&
                         expectedField.getFieldDataTypeType() == CsvFieldDataType.STRING;
