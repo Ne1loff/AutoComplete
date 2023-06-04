@@ -18,7 +18,8 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
-import org.example.model.FileLine;
+import org.example.model.file.FileLine;
+import org.example.model.file.LineInfo;
 import org.example.parser.CsvRowParser;
 import org.example.reader.Reader;
 
@@ -31,7 +32,8 @@ import java.util.stream.Collectors;
 public class LuceneIndexer implements Indexer {
 
     private final static String AIRPORT_FIELD = "airport_name";
-    private final static String FILE_POSITION = "document_position";
+    private final static String LINE_POSITION = "line_position";
+    private final static String LINE_LENGTH = "line_length";
 
     private final Directory luceneDirectory;
     private IndexReader luceneReader;
@@ -68,7 +70,7 @@ public class LuceneIndexer implements Indexer {
     }
 
     @Override
-    public List<Long> getIndexes(String value) {
+    public List<LineInfo> findValuesByPrefix(String value) {
 
         try {
             IndexSearcher searcher = new IndexSearcher(luceneReader);
@@ -83,10 +85,15 @@ public class LuceneIndexer implements Indexer {
             }
 
             return documents.stream()
-                    .map(doc ->
-                            doc.getField(FILE_POSITION)
-                                    .numericValue()
-                                    .longValue()
+                    .map(doc -> {
+                                var linePos = doc.getField(LINE_POSITION)
+                                        .numericValue()
+                                        .longValue();
+                                var lineLength = doc.getField(LINE_LENGTH)
+                                        .numericValue()
+                                        .intValue();
+                                return new LineInfo(linePos, lineLength);
+                            }
                     )
                     .collect(Collectors.toList());
         } catch (Exception e) {
@@ -104,11 +111,13 @@ public class LuceneIndexer implements Indexer {
 
     private Document createDocument(FileLine line) {
         var content = line.getContent();
+        var lineInfo = line.getLineInfo();
         var airportName = csvParser.parseField(content, 1);
 
         Document document = new Document();
         document.add(new StringField(AIRPORT_FIELD, airportName, Field.Store.NO));
-        document.add(new StoredField(FILE_POSITION, line.getStartPosition()));
+        document.add(new StoredField(LINE_POSITION, lineInfo.getStartPosition()));
+        document.add(new StoredField(LINE_POSITION, lineInfo.getLength()));
 
         return document;
     }

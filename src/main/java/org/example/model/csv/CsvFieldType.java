@@ -1,4 +1,4 @@
-package org.example.model;
+package org.example.model.csv;
 
 public enum CsvFieldType {
     NULLABLE_INTEGER,

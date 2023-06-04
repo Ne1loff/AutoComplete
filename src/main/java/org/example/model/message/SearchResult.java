@@ -1,8 +1,9 @@
-package org.example.model;
+package org.example.model.message;
 
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.example.model.AirportInfo;
 
 import java.util.List;
 

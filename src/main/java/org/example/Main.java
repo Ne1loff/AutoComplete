@@ -31,7 +31,3 @@ public class Main {
         looper.start(fileName);
     }
 }
-
-// command: column[1]<10 & column[5]='GKA' || column[5]='GTA'
-// command: column[1]<10 & column[5]='GKA'
-// column[1]<>0 & column[2]<>'opa' & column[3]<>'3232' & column[4]<>0 & column[5]<>0 & column[6]<>0 & column[7]<>0 & column[8]<>0 & column[9]<>0 & column[10]<>0 & column[11]<>0 & column[12]<>0 & column[13]<>0 & column[14]<>0

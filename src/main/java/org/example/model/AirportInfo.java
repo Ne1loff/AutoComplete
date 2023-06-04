@@ -1,20 +1,18 @@
 package org.example.model;
 
-import lombok.Builder;
 import lombok.Getter;
-import lombok.Singular;
-
-import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.example.model.csv.CsvField;
+import org.example.model.csv.CsvFieldDataType;
 
 @Getter
-@Builder
+@RequiredArgsConstructor
 public class AirportInfo {
     private final String name;
-    @Singular
-    private final List<CsvField> fields;
+    private final CsvField[] fields;
 
     public CsvField getField(int index) {
-        return fields.get(index);
+        return fields[index];
     }
 
     @Override
@@ -22,8 +20,8 @@ public class AirportInfo {
         final StringBuilder sb = new StringBuilder();
         sb.append('"').append(name).append('"');
         sb.append('[');
-        for (int i = 0, fieldsSize = fields.size(); i < fieldsSize; i++) {
-            var field = fields.get(i);
+        for (int i = 0, fieldsSize = fields.length; i < fieldsSize; i++) {
+            var field = fields[i];
             if (field.getFieldDataTypeType().equals(CsvFieldDataType.STRING)) {
                 sb.append('"').append(field.getValueAsString()).append('"');
             } else {

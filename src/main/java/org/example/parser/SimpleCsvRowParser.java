@@ -2,8 +2,8 @@ package org.example.parser;
 
 import org.example.config.CsvConfig;
 import org.example.model.AirportInfo;
-import org.example.model.CsvField;
-import org.example.model.CsvFieldDataType;
+import org.example.model.csv.CsvField;
+import org.example.model.csv.CsvFieldDataType;
 
 import java.util.Collection;
 import java.util.List;
@@ -13,7 +13,7 @@ public class SimpleCsvRowParser implements CsvRowParser {
 
     @Override
     public List<AirportInfo> parseRows(Collection<String> rows) {
-        return rows.stream()
+        return rows.parallelStream()
                 .map(this::getAirportInfo)
                 .collect(Collectors.toList());
     }
@@ -25,46 +25,47 @@ public class SimpleCsvRowParser implements CsvRowParser {
 
     private AirportInfo getAirportInfo(String str) {
         var fields = parseCsvRow(str, 0, CsvConfig.CSV_FIELD_COUNT);
-        return AirportInfo.builder()
-                .name(fields[1])
-                .field(new CsvField(getInt(fields[0]), CsvFieldDataType.INTEGER))
-                .field(new CsvField(fields[1], CsvFieldDataType.STRING))
-                .field(new CsvField(fields[2], CsvFieldDataType.STRING))
-                .field(new CsvField(fields[3], CsvFieldDataType.STRING))
-                .field(new CsvField(fields[4], CsvFieldDataType.STRING))
-                .field(new CsvField(fields[5], CsvFieldDataType.STRING))
-                .field(new CsvField(getDouble(fields[6]), CsvFieldDataType.DOUBLE))
-                .field(new CsvField(getDouble(fields[7]), CsvFieldDataType.DOUBLE))
-                .field(new CsvField(getInt(fields[8]), CsvFieldDataType.INTEGER))
-                .field(new CsvField(tryGetDouble(fields[9]), CsvFieldDataType.NULLABLE_DOUBLE))
-                .field(new CsvField(fields[10], CsvFieldDataType.STRING))
-                .field(new CsvField(fields[11], CsvFieldDataType.STRING))
-                .field(new CsvField(fields[12], CsvFieldDataType.STRING))
-                .field(new CsvField(fields[13], CsvFieldDataType.STRING))
-                .build();
+        var csvFields = new CsvField[]{
+                new CsvField(getInt(fields[0]), CsvFieldDataType.INTEGER),
+                new CsvField(fields[1], CsvFieldDataType.STRING),
+                new CsvField(fields[2], CsvFieldDataType.STRING),
+                new CsvField(fields[3], CsvFieldDataType.STRING),
+                new CsvField(fields[4], CsvFieldDataType.STRING),
+                new CsvField(fields[5], CsvFieldDataType.STRING),
+                new CsvField(getDouble(fields[6]), CsvFieldDataType.DOUBLE),
+                new CsvField(getDouble(fields[7]), CsvFieldDataType.DOUBLE),
+                new CsvField(getInt(fields[8]), CsvFieldDataType.INTEGER),
+                new CsvField(tryGetDouble(fields[9]), CsvFieldDataType.NULLABLE_DOUBLE),
+                new CsvField(fields[10], CsvFieldDataType.STRING),
+                new CsvField(fields[11], CsvFieldDataType.STRING),
+                new CsvField(fields[12], CsvFieldDataType.STRING),
+                new CsvField(fields[13], CsvFieldDataType.STRING)
+        };
+        return new AirportInfo(fields[1], csvFields);
     }
 
     private Integer tryGetInt(String field) {
         if (field.equals("\\N")) return null;
-        return Integer.parseInt(field);
+        return Integer.valueOf(field);
     }
 
     private Integer getInt(String field) {
-        return Integer.parseInt(field);
+        return Integer.valueOf(field);
     }
 
     private Double getDouble(String field) {
-        return Double.parseDouble(field);
+        return Double.valueOf(field);
     }
 
     private Double tryGetDouble(String field) {
         if (field.equals("\\N")) return null;
-        return Double.parseDouble(field);
+        return Double.valueOf(field);
 
     }
 
     private String[] parseCsvRow(String csvRow, int offset, int count) {
-        if (count + offset > CsvConfig.CSV_FIELD_COUNT) throw new IllegalArgumentException("To many rows");
+        if (count + offset > CsvConfig.CSV_FIELD_COUNT)
+            throw new IllegalArgumentException("Слишком много полей для парсинга CSV");
 
         String[] result = new String[count];
         StringBuilder builder = new StringBuilder();

@@ -1,4 +1,4 @@
-package org.example.model;
+package org.example.model.csv;
 
 import lombok.Getter;
 
@@ -14,19 +14,19 @@ public class CsvField {
 
     public int getIntValue() {
         if (fieldDataTypeType != CsvFieldDataType.INTEGER && fieldDataTypeType != CsvFieldDataType.NULLABLE_INTEGER)
-            throw new ClassCastException();
+            throw new ClassCastException("Не возможно получить Integer из " + fieldDataTypeType.getClazz());
         return (Integer) value;
     }
 
     public double getDoubleValue() {
         if (fieldDataTypeType != CsvFieldDataType.DOUBLE && fieldDataTypeType != CsvFieldDataType.NULLABLE_DOUBLE)
-            throw new ClassCastException();
+            throw new ClassCastException("Не возможно получить Double из " + fieldDataTypeType.getClazz());
         return (Double) value;
     }
 
     public String getStringValue() {
         if (fieldDataTypeType != CsvFieldDataType.STRING)
-            throw new ClassCastException();
+            throw new ClassCastException("Не возможно получить String из " + fieldDataTypeType.getClazz());
         return (String) value;
     }
 

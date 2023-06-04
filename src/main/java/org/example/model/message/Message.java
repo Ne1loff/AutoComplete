@@ -1,12 +1,11 @@
-package org.example.model;
+package org.example.model.message;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class FileLine {
+public class Message {
     private final String content;
-    private final long startPosition;
-    private final long length;
+    private final boolean quitRequest;
 }

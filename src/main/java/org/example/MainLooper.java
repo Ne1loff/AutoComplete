@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.command.FilterCommand;
 import org.example.command.SearchCommand;
 import org.example.messager.Messenger;
-import org.example.model.SearchResult;
+import org.example.model.message.SearchResult;
 import org.example.parser.FilterParser;
 import org.example.searcher.Searcher;
 
@@ -19,14 +19,18 @@ public class MainLooper {
         searcher.init(fileName);
 
         while (true) {
-            FilterCommand filterCommand = getFilterCommand();
-            if (filterCommand == null) break;
+            try {
+                FilterCommand filterCommand = getFilterCommand();
+                if (filterCommand == null) break;
 
-            var message = messenger.requestNamePrefix();
-            if (message.isQuitRequest()) break;
+                var message = messenger.requestNamePrefix();
+                if (message.isQuitRequest()) break;
 
-            SearchResult result = searcher.search(new SearchCommand(message.getContent(), filterCommand));
-            messenger.responseResults(result);
+                SearchResult result = searcher.search(new SearchCommand(message.getContent(), filterCommand));
+                messenger.responseResults(result);
+            } catch (Exception e) {
+                System.out.println("Произошла ошибка: " + e.getMessage());
+            }
         }
     }
 

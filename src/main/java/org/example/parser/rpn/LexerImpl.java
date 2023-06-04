@@ -28,8 +28,10 @@ public class LexerImpl implements Lexer {
 
             switch (token) {
                 case "&":
+                case "&&":
                     tokens.add(new BooleanOperationToken(BooleanOperationType.AND));
                     break;
+                case "|":
                 case "||":
                     tokens.add(new BooleanOperationToken(BooleanOperationType.OR));
                     break;
@@ -40,7 +42,7 @@ public class LexerImpl implements Lexer {
                     tokens.add(new OtherToken(TokenType.CLOSE_BRACKET));
                     break;
                 default:
-                    throw new RuntimeException("Unexpected token: " + token);
+                    throw new RuntimeException("Неожиданный токен: " + token);
             }
         }
         return tokens;
@@ -67,7 +69,9 @@ public class LexerImpl implements Lexer {
         ExpressionToken token = new ExpressionToken();
 
         if (matcher.groupCount() != 3) {
-            throw new IllegalStateException("Expression should have 3 groups (column, compare operation, value)");
+            throw new IllegalStateException(
+                    "Фильтр сравнения должен состоять из 3-х элементов: (номер колонки, оператор сравнения, значение)"
+            );
         }
 
         for (int i = 0; i < 3 && matcher.find(); i++) {

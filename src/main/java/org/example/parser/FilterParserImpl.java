@@ -1,9 +1,9 @@
 package org.example.parser;
 
 import org.example.command.FilterCommand;
-import org.example.parser.rpn.StackMachineImpl;
 import org.example.parser.rpn.LexerImpl;
 import org.example.parser.rpn.PostfixConverterImpl;
+import org.example.parser.rpn.StackMachineImpl;
 import org.example.parser.rpn.token.Token;
 
 import java.util.List;
@@ -16,8 +16,8 @@ public class FilterParserImpl implements FilterParser {
 
     @Override
     public FilterCommand parse(String value) {
-        if (value.isEmpty() || value.isBlank()) return new FilterCommand((info) -> true);
-
+        if (value.isEmpty() || value.isBlank())
+            return new FilterCommand((info) -> true);
 
         List<Token> tokens = lexer.getTokens(value);
         List<Token> postfixExpression = converter.convertToPostfix(tokens);

@@ -1,7 +1,8 @@
 package org.example.searcher.indexer;
 
 import lombok.RequiredArgsConstructor;
-import org.example.model.FileLine;
+import org.example.model.file.FileLine;
+import org.example.model.file.LineInfo;
 import org.example.parser.CsvRowParser;
 import org.example.reader.Reader;
 
@@ -117,7 +118,7 @@ public class SimpleIndexer implements Indexer {
         }
     }
 
-    private final SimpleIndex<Long> index = new SimpleIndex<>();
+    private final SimpleIndex<LineInfo> index = new SimpleIndex<>();
 
     private final Reader reader;
     private final CsvRowParser csvParser;
@@ -131,7 +132,7 @@ public class SimpleIndexer implements Indexer {
                 for (FileLine line : lines) {
                     var content = line.getContent();
                     var airportName = csvParser.parseField(content, 1);
-                    index.putValue(airportName, line.getStartPosition());
+                    index.putValue(airportName, line.getLineInfo());
                 }
             }
 
@@ -142,7 +143,7 @@ public class SimpleIndexer implements Indexer {
     }
 
     @Override
-    public List<Long> getIndexes(String value) {
+    public List<LineInfo> findValuesByPrefix(String value) {
         return index.getValuesByIndexPrefix(value);
     }
 }
