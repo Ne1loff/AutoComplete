@@ -16,32 +16,36 @@ public class PostfixConverterImpl implements PostfixConverter {
     public List<Token> convertToPostfix(List<Token> source) {
         List<Token> postfixExpression = new ArrayList<>();
         Deque<Token> operationStack = new LinkedList<>();
-        for (Token token : source) {
-            switch (token.getToken()) {
-                case EXPRESSION:
-                    postfixExpression.add(token);
-                    break;
-                case OPEN_BRACKET:
-                    operationStack.push(token);
-                    break;
-                case CLOSE_BRACKET: {
-                    while (!operationStack.isEmpty() && operationStack.peek().getToken() != TokenType.OPEN_BRACKET) {
-                        postfixExpression.add(operationStack.pop());
+        try {
+            for (Token token : source) {
+                switch (token.getToken()) {
+                    case EXPRESSION:
+                        postfixExpression.add(token);
+                        break;
+                    case OPEN_BRACKET:
+                        operationStack.push(token);
+                        break;
+                    case CLOSE_BRACKET: {
+                        while (!operationStack.isEmpty() && operationStack.peek().getToken() != TokenType.OPEN_BRACKET) {
+                            postfixExpression.add(operationStack.pop());
+                        }
+                        operationStack.pop();
+                        break;
                     }
-                    operationStack.pop();
-                    break;
-                }
-                case BOOLEAN_OPERATION: {
-                    while (!operationStack.isEmpty() && getPriority(operationStack.peek()) >= getPriority(token)) {
-                        postfixExpression.add(operationStack.pop());
+                    case BOOLEAN_OPERATION: {
+                        while (!operationStack.isEmpty() && getPriority(operationStack.peek()) >= getPriority(token)) {
+                            postfixExpression.add(operationStack.pop());
+                        }
+                        operationStack.push(token);
+                        break;
                     }
-                    operationStack.push(token);
-                    break;
                 }
             }
-        }
-        while (!operationStack.isEmpty()) {
-            postfixExpression.add(operationStack.pop());
+            while (!operationStack.isEmpty()) {
+                postfixExpression.add(operationStack.pop());
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Ошибка при парсинге фильтра. Проверьте правильность введенного фильтра");
         }
         return postfixExpression;
     }
