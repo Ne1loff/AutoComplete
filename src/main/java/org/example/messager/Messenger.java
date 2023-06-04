@@ -1,7 +1,7 @@
 package org.example.messager;
 
-import org.example.model.Message;
-import org.example.model.SearchResult;
+import org.example.model.message.Message;
+import org.example.model.message.SearchResult;
 
 public interface Messenger {
     Message requestFilter();

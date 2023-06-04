@@ -2,6 +2,7 @@ package org.example;
 
 import org.example.messager.ConsoleMessenger;
 import org.example.messager.Messenger;
+import org.example.parser.CsvRowParser;
 import org.example.parser.FilterParser;
 import org.example.parser.FilterParserImpl;
 import org.example.parser.SimpleCsvRowParser;
@@ -20,8 +21,9 @@ public class Main {
         }
 
         Reader reader = new CsvReader();
-        Indexer indexer = new SimpleIndexer(reader);
-        Searcher searcher = new SearcherImpl(indexer, reader, new SimpleCsvRowParser());
+        CsvRowParser csvParser = new SimpleCsvRowParser();
+        Indexer indexer = new SimpleIndexer(reader, csvParser);
+        Searcher searcher = new SearcherImpl(indexer, reader, csvParser);
 
         Messenger messenger = new ConsoleMessenger();
         FilterParser filterParser = new FilterParserImpl();
@@ -29,6 +31,3 @@ public class Main {
         looper.start(fileName);
     }
 }
-
-// command: column[1]<10 & column[5]='GKA' || column[5]='GTA'
-// command: column[1]<10 & column[5]='GKA'

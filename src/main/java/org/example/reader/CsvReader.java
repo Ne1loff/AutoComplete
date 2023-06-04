@@ -1,6 +1,7 @@
 package org.example.reader;
 
-import org.example.model.FileLine;
+import org.example.model.file.FileLine;
+import org.example.model.file.LineInfo;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -9,7 +10,6 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class CsvReader implements Reader {
@@ -30,21 +30,27 @@ public class CsvReader implements Reader {
     }
 
     @Override
-    public List<String> getLines(Collection<Long> positions) throws IOException {
+    public List<String> getLines(List<LineInfo> lines) throws IOException {
         ensureOpen();
 
         List<String> result = new ArrayList<>();
         try {
             var channel = reader.getChannel();
 
-            for (Long position : positions) {
-                if (channel.read(buffer, position) > 0) {
-                    buffer.rewind();
-                    CharBuffer charBuffer = getCharBuffer(buffer);
-                    var line = getFirstLineFromBuffer(charBuffer);
-                    result.add(line);
-                    buffer.flip();
+            for (LineInfo lineInfo : lines) {
+                var newLimit = buffer.position() + lineInfo.getLength();
+                if (newLimit > buffer.capacity()) {
+                    readFromByteBuffer(buffer, result);
+                    newLimit = buffer.position() + lineInfo.getLength();
                 }
+                buffer.limit(newLimit);
+                if (channel.read(buffer, lineInfo.getStartPosition()) <= 0) {
+                    readFromByteBuffer(buffer, result);
+                }
+            }
+
+            if (buffer.position() > 0) {
+                readFromByteBuffer(buffer, result);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -53,8 +59,9 @@ public class CsvReader implements Reader {
         return result;
     }
 
+
     @Override
-    public List<FileLine> getFileLinesFormBuffer(String fileName) throws IOException {
+    public List<FileLine> getFileLinesFormBuffer() throws IOException {
         ensureOpen();
 
         var channel = reader.getChannel();
@@ -64,7 +71,7 @@ public class CsvReader implements Reader {
                 buffer.rewind();
                 CharBuffer charBuffer = getCharBuffer(buffer);
                 var lastSepPos = updateBufferAndGetLastLineSeparatorPos(buffer, charBuffer);
-                var result = getLinesFromBuffer(charBuffer, lastSepPos, cursorOffset);
+                var result = getFileLinesFromCharBuffer(charBuffer, lastSepPos, cursorOffset);
                 cursorOffset += buffer.capacity() - buffer.position();
 
                 return result;
@@ -95,6 +102,14 @@ public class CsvReader implements Reader {
         return StandardCharsets.UTF_8.encode(charBuffer);
     }
 
+    private void readFromByteBuffer(ByteBuffer buffer, List<String> result) {
+        buffer.rewind();
+        CharBuffer charBuffer = getCharBuffer(buffer);
+        var line = getAllLinesFromCharBuffer(charBuffer);
+        result.addAll(line);
+        buffer.flip();
+    }
+
     private int updateBufferAndGetLastLineSeparatorPos(
             ByteBuffer buffer,
             CharBuffer charBuffer
@@ -110,34 +125,19 @@ public class CsvReader implements Reader {
         return 0;
     }
 
-    private String getFirstLineFromBuffer(CharBuffer charBuffer) {
+    private List<String> getAllLinesFromCharBuffer(CharBuffer charBuffer) {
+        List<String> result = new ArrayList<>();
         var start = 0;
         for (int i = 0; i < charBuffer.length(); i++) {
             if (charBuffer.get(i) == '\n') {
-                if (start != 0) {
-                    return charBuffer.subSequence(start, i).toString();
-                } else {
-                    var subBuff = charBuffer.subSequence(start, i);
-                    var commaCounter = 0;
-                    boolean wasOpenDoubleQuotes = false;
-                    for (int j = subBuff.position(); j < subBuff.length(); j++) {
-                        char ch = subBuff.get(j);
-                        if (ch == '"') {
-                            wasOpenDoubleQuotes = !wasOpenDoubleQuotes;
-                        }
-                        if (ch == ',' && !wasOpenDoubleQuotes) commaCounter++;
-                    }
-                    if (commaCounter == 13) {
-                        return subBuff.toString();
-                    }
-                    start = i + 1;
-                }
+                result.add(charBuffer.subSequence(start, i).toString());
+                start = i + 1;
             }
         }
-        return "";
+        return result;
     }
 
-    private List<FileLine> getLinesFromBuffer(CharBuffer charBuffer, int lastSepIndex, long offset) {
+    private List<FileLine> getFileLinesFromCharBuffer(CharBuffer charBuffer, int lastSepIndex, long offset) {
         List<FileLine> result = new ArrayList<>();
         StringBuilder builder = new StringBuilder();
         var charBuffLastPos = 0;
@@ -148,12 +148,11 @@ public class CsvReader implements Reader {
 
                 builder.append(subSeq);
                 builder.deleteCharAt(builder.length() - 1);
-                replaceAllUselessDoubleQuotes(builder);
 
                 var byteBuff = getByteBuffer(subSeq);
                 int lineLength = byteBuff.limit() - byteBuff.position();
 
-                result.add(new FileLine(builder.toString(), fileOffset, lineLength));
+                result.add(new FileLine(builder.toString(), new LineInfo(fileOffset, lineLength)));
 
                 fileOffset += lineLength;
 
@@ -163,19 +162,5 @@ public class CsvReader implements Reader {
         }
 
         return result;
-    }
-
-    private void replaceAllUselessDoubleQuotes(StringBuilder builder) {
-
-        for (int i = 0; i < builder.length(); i++) {
-            char ch = builder.charAt(i);
-            if (ch == '\\' && builder.charAt((i + 1) % builder.length()) == '"') {
-                builder.deleteCharAt(i);
-                continue;
-            }
-            if (ch == '"') {
-                builder.deleteCharAt(i);
-            }
-        }
     }
 }
